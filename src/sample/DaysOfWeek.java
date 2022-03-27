@@ -1,11 +1,11 @@
 package sample;
 
 public enum DaysOfWeek {
-    享,
-    买,
-    佯,
-    昨,
-    向,
-    厌,
-    埋
+    袩薪,
+    袙褌,
+    小褉,
+    效褌,
+    袩褌,
+    小斜,
+    袙褋
 }
