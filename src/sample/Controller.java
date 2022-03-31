@@ -7,7 +7,6 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
-import javafx.scene.text.Text;
 
 
 public class Controller {
@@ -53,10 +52,7 @@ public class Controller {
         int i = 0;
         Set<Integer> setKeys = currMonth.keySet();
         for(Integer k: setKeys) {
-//            Text tmp = new Text(String.valueOf(k));
             addButtons(k,currMonth.get(k),i);
-//            gridPane.add(tmp, currMonth.get(k), i);
-//            GridPane.setHalignment(tmp, HPos.CENTER);
             if(currMonth.get(k) == 6) i++;
         }
     }
