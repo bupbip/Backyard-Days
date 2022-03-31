@@ -37,86 +37,41 @@
                 <RowConstraints maxHeight="120.0" minHeight="10.0" prefHeight="120.0" vgrow="SOMETIMES" />
                   <RowConstraints maxHeight="120.0" minHeight="10.0" prefHeight="120.0" vgrow="SOMETIMES" />
               </rowConstraints>
-                <columnConstraints>
-                    <ColumnConstraints halignment="CENTER" />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                  <ColumnConstraints />
-                </columnConstraints>
                <opaqueInsets>
                   <Insets />
                </opaqueInsets>
             </GridPane>
-            <Label layoutX="127.0" layoutY="125.0" text="Пн">
+            <Label layoutX="151.0" layoutY="125.0" text="Пн">
                <font>
                   <Font name="Forte" size="17.0" />
                </font>
             </Label>
-            <Label layoutX="233.0" layoutY="125.0" text="Вт">
+            <Label layoutX="239.0" layoutY="125.0" text="Вт">
                <font>
                   <Font name="Forte" size="17.0" />
                </font>
             </Label>
-            <Label layoutX="338.0" layoutY="125.0" text="Ср">
+            <Label layoutX="334.0" layoutY="125.0" text="Ср">
                <font>
                   <Font name="Forte" size="17.0" />
                </font>
             </Label>
-            <Label layoutX="433.0" layoutY="125.0" text="Чт">
+            <Label layoutX="426.0" layoutY="125.0" text="Чт">
                <font>
                   <Font name="Forte" size="17.0" />
                </font>
             </Label>
-            <Label layoutX="539.0" layoutY="125.0" text="Пт">
+            <Label layoutX="516.0" layoutY="125.0" text="Пт">
                <font>
                   <Font name="Forte" size="17.0" />
                </font>
             </Label>
-            <Label layoutX="636.0" layoutY="125.0" text="Сб">
+            <Label layoutX="605.0" layoutY="125.0" text="Сб">
                <font>
                   <Font name="Forte" size="17.0" />
                </font>
             </Label>
-            <Label layoutX="737.0" layoutY="125.0" text="Вс">
+            <Label layoutX="694.0" layoutY="125.0" text="Вс">
                <font>
                   <Font name="Forte" size="17.0" />
                </font>

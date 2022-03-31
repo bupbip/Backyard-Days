@@ -2,10 +2,12 @@ package sample;
 
 import java.util.*;
 import javafx.fxml.FXML;
+import javafx.geometry.HPos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Text;
 
 
 public class Controller {
@@ -51,8 +53,10 @@ public class Controller {
         int i = 0;
         Set<Integer> setKeys = currMonth.keySet();
         for(Integer k: setKeys) {
-            Label tmp = new Label(String.valueOf(k));
-            gridPane.add(tmp, currMonth.get(k), i);
+//            Text tmp = new Text(String.valueOf(k));
+            addButtons(k,currMonth.get(k),i);
+//            gridPane.add(tmp, currMonth.get(k), i);
+//            GridPane.setHalignment(tmp, HPos.CENTER);
             if(currMonth.get(k) == 6) i++;
         }
     }
@@ -76,4 +80,16 @@ public class Controller {
     }
 
 
+    public void addButtons(int id, int col, int row){
+        Button button = new Button(String.valueOf(id));
+        button.setMaxWidth(Double.MAX_VALUE);
+        button.setMaxHeight(Double.MAX_VALUE);
+        button.setStyle("-fx-background-color: transparent;");
+        button.setId(String.valueOf(id));
+        GridPane.setConstraints(button, col, row);
+        gridPane.getChildren().add(button);
+        button.setOnAction(e ->{
+            System.out.println(id);
+        });
+    }
 }
