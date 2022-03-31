@@ -6,6 +6,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
 
 
 public class Controller {
@@ -52,6 +53,7 @@ public class Controller {
         Set<Integer> setKeys = currMonth.keySet();
         for(Integer k: setKeys) {
             Label tmp = new Label(String.valueOf(k));
+            tmp.setTextFill(Color.web("#FFFFFF"));
             gridPane.add(tmp, currMonth.get(k), i);
             if(currMonth.get(k) == 6) i++;
         }
