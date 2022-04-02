@@ -1,7 +1,6 @@
 package sample;
 
 import java.util.*;
-
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.scene.Node;
@@ -10,10 +9,6 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
-
-import static javafx.scene.paint.Color.LIGHTCORAL;
-import static javafx.scene.paint.Color.RED;
-
 
 public class Controller {
 
@@ -70,27 +65,40 @@ public class Controller {
         Map<Integer, Integer> dayToMonthAfter = new HashMap<>();
         Calendar maxDays = new GregorianCalendar(year, month, 1);
         int days = maxDays.getActualMaximum(Calendar.DAY_OF_MONTH);
-        for(int i = 1; i < 43 - days - dayToMonth.get(1); i++) {
-            Calendar date = new GregorianCalendar(year, month + 1, i);
+        for(int day = 1; day < 43 - days - dayToMonth.get(1); day++) {
+            Calendar date = new GregorianCalendar(year, month + 1, day);
             int rightDay = (date.get(Calendar.DAY_OF_WEEK) + 5) % 7;
             dayToMonthAfter.put(date.get(Calendar.DAY_OF_MONTH), rightDay);
         }
         return dayToMonthAfter;
     }
 
-    public int addText(Map<Integer, Integer> days, int week) {
+    public int addPanel(Map<Integer, Integer> days, int week, boolean clickable) {
         Set<Integer> setKeys = days.keySet();
-        for (Integer k : setKeys) {
-            Text text = new Text(String.valueOf(k));
-            text.setStyle("-fx-font-size: 25px");
-            GridPane.setHalignment(text, HPos.CENTER);
-            if(days.get(k) > 4 && days.get(k) < 7) {
-                text.setFill(Color.RED);
-            } else {
-                text.setFill(Color.GRAY);
+        if(clickable){
+            for (Integer k : setKeys) {
+                int dayOfWeek = days.get(k);
+                if(dayOfWeek == 5 || dayOfWeek == 6) {
+                    addButtons(k, days.get(k), week, "red");
+                } else {
+                    addButtons(k, days.get(k), week, "white");
+                }
+                if (dayOfWeek == 6) week++;
             }
-            gridPane.add(text, days.get(k), week);
-            if (days.get(k) == 6) week++;
+        } else {
+            for (Integer k : setKeys) {
+                int dayOfWeek = days.get(k);
+                Text text = new Text(String.valueOf(k));
+                text.setStyle("-fx-font-size: 25px");
+                GridPane.setHalignment(text, HPos.CENTER);
+                if(dayOfWeek == 5 || dayOfWeek == 6) {
+                    text.setFill(Color.CORAL);
+                } else {
+                    text.setFill(Color.GRAY);
+                }
+                gridPane.add(text, dayOfWeek, week);
+                if (dayOfWeek == 6) week++;
+            }
         }
         return week;
     }
@@ -100,17 +108,9 @@ public class Controller {
         Map<Integer, Integer> dayToMonthBefore = getDaysBefore(currMonth);
         Map<Integer, Integer> dayToMonthAfter = getDaysAfter(currMonth);
         int week = 0;
-        week = addText(dayToMonthBefore, week);
-        Set<Integer> setKeys = currMonth.keySet();
-        for (Integer k : setKeys) {
-            if(currMonth.get(k) > 4 && currMonth.get(k) < 7) {
-                addButtons(k, currMonth.get(k), week, "red");
-            } else {
-                addButtons(k, currMonth.get(k), week, "white");
-            }
-            if (currMonth.get(k) == 6) week++;
-        }
-        addText(dayToMonthAfter, week);
+        week = addPanel(dayToMonthBefore, week, false);
+        week = addPanel(currMonth, week, true);
+        addPanel(dayToMonthAfter, week,false);
     }
 
     public void toLowerMonth() {
@@ -132,16 +132,17 @@ public class Controller {
     }
 
 
-    public void addButtons(int id, int col, int row, String color) {
-        Button button = new Button(String.valueOf(id));
+    public void addButtons(int day, int col, int row, String color) {
+        String currentDate = String.format("%02d:%02d:%d", day, month, year);
+        Button button = new Button(String.valueOf(day));
         button.setMaxWidth(Double.MAX_VALUE);
         button.setMaxHeight(Double.MAX_VALUE);
-        button.setStyle("-fx-background-color: transparent; -fx-text-fill: " + color + " ; -fx-font-size: 25px");
-        button.setId(String.valueOf(id));
+        button.setStyle("-fx-background-color: transparent; -fx-text-fill: " + color + "; -fx-font-size: 25px");
+        button.setId(currentDate);
         GridPane.setConstraints(button, col, row);
         gridPane.getChildren().add(button);
         button.setOnAction(e -> {
-            System.out.println(id);
+            System.out.println(currentDate);
         });
     }
 }
