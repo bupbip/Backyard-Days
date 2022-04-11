@@ -1,11 +1,17 @@
 package sample;
 
+import java.io.IOException;
 import java.util.*;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
+import javafx.geometry.VPos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -142,7 +148,74 @@ public class Controller {
         GridPane.setConstraints(button, col, row);
         gridPane.getChildren().add(button);
         button.setOnAction(e -> {
+            cellSelected(currentDate);
             System.out.println(currentDate);
         });
+    }
+
+    public void cellSelected(String currentDate) {
+        clearGridPane();
+//        AnchorPane newPane = new AnchorPane();
+//        root.setTop(newPane);
+        Button buttonBack = createBackButton();
+        TextArea notes = createNotesArea();
+        Text date = createDateText(currentDate);
+        Text textNote = createNoteText();
+//        buttonBack.setOnAction(t -> {
+//            gridPane.getChildren().remove(buttonBack);
+//            gridPane.getChildren().remove(date);
+//            gridPane.getChildren().remove(notes);
+//            gridPane.getChildren().remove(textNote);
+//            fillCalendar();
+//        });
+        buttonBack.setOnAction(t -> {
+            Scene scene2 = null;
+            try {
+                scene2 = new Scene(FXMLLoader.load(getClass().getResource("sample2.fxml")));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            Scene finalScene = scene2;
+            Main.switchScenes(finalScene);
+        });
+    }
+
+    private Button createBackButton(){
+        Button buttonBack = new Button("X");
+        buttonBack.setMaxWidth(10);
+        buttonBack.setMaxHeight(10);
+        buttonBack.setStyle("-fx-background-color: red;");
+        GridPane.setConstraints(buttonBack, 6, 0);
+        GridPane.setHalignment(buttonBack, HPos.RIGHT);
+        GridPane.setValignment(buttonBack, VPos.TOP);
+        gridPane.getChildren().add(buttonBack);
+        return buttonBack;
+    }
+
+    private Text createDateText(String currentDate){
+        Text date = new Text(currentDate);
+        date.setStyle("-fx-font-size: 50;");
+        date.setFill(Color.WHITE);
+        GridPane.setValignment(date, VPos.CENTER);
+        gridPane.setConstraints(date, 0, 0);
+        gridPane.getChildren().add(date);
+        return date;
+    }
+    private TextArea createNotesArea() {
+        TextArea textArea = new TextArea();
+        gridPane.setConstraints(textArea, 4, 3, 4, 5);
+        gridPane.getChildren().add(textArea);
+        return textArea;
+    }
+
+    private Text createNoteText(){
+        Text textNote = new Text("Заметки");
+        textNote.setStyle("-fx-font-size: 45;");
+        textNote.setFill(Color.WHITE);
+        GridPane.setHalignment(textNote, HPos.CENTER);
+        gridPane.setConstraints(textNote, 3, 1);
+        gridPane.getChildren().add(textNote);
+        return textNote;
     }
 }
