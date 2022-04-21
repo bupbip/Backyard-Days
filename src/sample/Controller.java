@@ -6,13 +6,10 @@ import java.util.*;
 
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
-import javafx.geometry.VPos;
 import javafx.scene.Cursor;
-import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -155,7 +152,7 @@ public class Controller {
 
 
     public void addButtons(int day, int col, int row, String color) {
-        String currentDate = String.format("%02d.%02d.%d", day, month, year);
+        String currentDate = String.format("%02d.%02d.%d", day, month + 1, year);
         Button button = new Button(String.valueOf(day));
         button.setMaxWidth(Double.MAX_VALUE);
         button.setMaxHeight(Double.MAX_VALUE);
