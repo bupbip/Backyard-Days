@@ -20,6 +20,7 @@ public class Main extends Application {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        primaryStage.setResizable(false);
         primaryStage.setTitle("BACKYARD DAYS");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();

@@ -23,7 +23,7 @@
          <children>
             <ImageView fitHeight="745.0" fitWidth="893.0" layoutY="-1.0">
                <image>
-                  <Image url="@141.jpg" />
+                  <Image url="@../images/141.jpg" />
                </image>
             </ImageView>
             <GridPane fx:id="gridPane" alignment="CENTER" cache="true" depthTest="DISABLE" gridLinesVisible="true" layoutX="116.0" layoutY="159.0" prefHeight="540.0" prefWidth="630.0">
@@ -89,7 +89,7 @@
                </font></Label>
             <ImageView layoutX="23.0" layoutY="379.0" onMousePressed="#toLowerMonth">
                <image>
-                  <Image url="@стрелкаLeft.jpg" />
+                  <Image url="@../images/стрелкаLeft.jpg" />
                </image>
                <cursor>
                   <Cursor fx:constant="HAND" />
@@ -97,7 +97,7 @@
             </ImageView>
             <ImageView layoutX="812.0" layoutY="379.0" onMousePressed="#toHigherMonth">
                <image>
-                  <Image url="@стрелкаRight.jpg" />
+                  <Image url="@../images/стрелкаRight.jpg" />
                </image>
                <cursor>
                   <Cursor fx:constant="HAND" />
