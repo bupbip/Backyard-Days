@@ -2,6 +2,9 @@ package sample;
 
 import java.io.IOException;
 import java.time.Month;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.util.*;
 
 import javafx.fxml.FXML;
@@ -10,6 +13,7 @@ import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -26,6 +30,9 @@ public class Controller {
 
     @FXML
     private Label currMonth;
+
+    @FXML
+    private TextField toSearch;
 
     @FXML
     private GridPane gridPane;
@@ -142,6 +149,25 @@ public class Controller {
         clearGridPane();
         ++month;
         fillCalendar();
+    }
+
+    public void search() {
+        try {
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.uuuu").withResolverStyle(ResolverStyle.STRICT);
+            dateFormatter.parse(toSearch.getText());
+            String[] searchArray;
+            searchArray = toSearch.getText().split("[.]");
+            int searchMonth = Integer.parseInt(searchArray[0]);
+            int searchYear = Integer.parseInt(searchArray[1]);
+            month = searchMonth - 1;
+            year = searchYear;
+            clearGridPane();
+            fillCalendar();
+        } catch (DateTimeParseException e) {
+            System.out.println("Date is not valid");
+        } finally {
+            toSearch.setText("");
+        }
     }
 
     public void clearGridPane() {
