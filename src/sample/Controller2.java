@@ -1,3 +1,4 @@
+/*
 package sample;
 
 import javafx.fxml.FXMLLoader;
@@ -11,3 +12,4 @@ public class Controller2 {
         Main.switchScenesBack();
     }
 }
+*/
