@@ -1,41 +1,30 @@
 package sample;
 
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 import java.util.*;
 
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
-import javafx.geometry.VPos;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.control.TextArea;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 
+import static sample.Files.addToFile;
 
 public class Controller {
     public static Calendar today = new GregorianCalendar();
     public static int month;
     public static int year;
-    private static Map<Integer,String> currMonthForecast = new HashMap<>();
+    private static Map<Integer, String> currMonthForecast = new HashMap<>();
 
     @FXML
     private Label currMonth;
@@ -44,16 +33,12 @@ public class Controller {
     private ImageView exitButton;
 
     @FXML
-    private AnchorPane anchorPane;
-    
-    @FXML
     private TextField toSearch;
 
     @FXML
     private GridPane gridPane;
 
     @FXML
-
     private ImageView backgroundImage;
 
     @FXML
@@ -64,9 +49,7 @@ public class Controller {
 
     @FXML
     private ImageView prevMonthButton;
-  
-    @FXML
-    private Button backToCalendar;
+
 
 
     public void initialize() {
@@ -116,7 +99,7 @@ public class Controller {
         return dayToMonthAfter;
     }
 
-    public void updateYear(){
+    public void updateYear() {
         if (month == 12) {
             month = 0;
             ++year;
@@ -169,7 +152,7 @@ public class Controller {
         week = addPanel(dayToMonthBefore, week, false);
         week = addPanel(currMonth, week, true);
         addPanel(dayToMonthAfter, week, false);
-        currMonthForecast = getWeather();
+        currMonthForecast = Weather.getWeather(month,year);
     }
 
     public void toLowerMonth() {
@@ -211,7 +194,7 @@ public class Controller {
 
 
     public void addButtons(int day, int col, int row, String color, String border) {
-        String currentDate = String.format("%02d.%02d.%d", day, month, year);
+        String currentDate = String.format("%02d.%02d.%d", day, month + 1, year);
         Button button = new Button(String.valueOf(day));
         button.setMaxWidth(Double.MAX_VALUE);
         button.setMaxHeight(Double.MAX_VALUE);
@@ -223,21 +206,13 @@ public class Controller {
         button.setOnAction(e -> {
             cellSelected();
             System.out.println(currentDate);
-            Scene scene2 = null;
-            try {
-                scene2 = new Scene(FXMLLoader.load(getClass().getResource("sample2.fxml")));
-            } catch (IOException a) {
-                a.printStackTrace();//переписать
-            }
-            Scene finalScene = scene2;
-            Main.switchScenes(finalScene);
+            System.out.println(currMonthForecast.get(day - 1));
         });
     }
 
     public void cellSelected() {
         blur(true, backgroundImage, gridPane, daysOfWeekLabel, nextMonthButton, prevMonthButton);
         exitButton.setVisible(true);
-        chosenDate();
         exitButton.setOnMouseClicked(t -> {
             blur(false, backgroundImage, gridPane, daysOfWeekLabel, nextMonthButton, prevMonthButton);
             clearGridPane();
@@ -247,7 +222,7 @@ public class Controller {
     }
 
     public void blur(boolean blur, Node... objects) {
-        if(blur){
+        if (blur) {
             Arrays.stream(objects).forEach(obj -> obj.setEffect(new GaussianBlur()));
             Arrays.stream(objects).forEach(obj -> obj.setDisable(blur));
         } else {
@@ -256,37 +231,5 @@ public class Controller {
         }
     }
 
-    private void chosenDate() {
-
-    }
 }
-    private Map<Integer, String> getWeather() {
-        String urlString = "https://world-weather.ru/pogoda/russia/moscow/" + Month.of(month + 1).name() + "-" + year + "/";
-        System.out.println(urlString);
-        ArrayList<String> celsius = new ArrayList<>();
-        ArrayList<String> weather = new ArrayList<>();
-        Map<Integer,String> forecastCurrentMonth = new HashMap<>();
-        try {
-            Document page = Jsoup.connect(urlString).get();
-            Elements weatherDays = page.getElementsByClass("ww-month");
-            String[] forecast = page.select(".ww-month").toString().split("=");
-            String[] monthWeatherString = weatherDays.text().split(" ");
-            int dayNum = 1;
-            for (int i = 0; i < monthWeatherString.length; i += 2) {
-                celsius.add(monthWeatherString[i].replaceFirst(dayNum + "", ""));
-                dayNum++;
-            }
-            for (int i = 0; i < forecast.length; i++) {
-                if(forecast[i].endsWith("title")){
-                    weather.add(forecast[i+1].replace(" class",""));
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        for (int i = 0; i < celsius.size(); i++) {
-            forecastCurrentMonth.put(i, celsius.get(i) + " " + weather.get(i));
-        }
-        return forecastCurrentMonth;
-    }
 //внедриться в getcurrmonth

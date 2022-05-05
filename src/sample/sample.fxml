@@ -52,7 +52,7 @@
                <font>
                   <Font name="System Bold" size="20.0" />
                </font></Label>
-            <ImageView layoutX="23.0" layoutY="379.0" onMousePressed="#toLowerMonth">
+            <ImageView fx:id="prevMonthButton" layoutX="23.0" layoutY="379.0" onMousePressed="#toLowerMonth">
                <image>
                   <Image url="@../images/стрелкаLeft.jpg" />
                </image>
@@ -70,7 +70,7 @@
             </ImageView>
             <ImageView fx:id="exitButton" fitHeight="25.0" fitWidth="25.0" layoutX="745.0" layoutY="164.0" pickOnBounds="true" preserveRatio="true" visible="false">
                <image>
-                  <Image url="@X.jpg" />
+                  <Image url="@../images/X.jpg" />
                </image>
             </ImageView>
             <ImageView fitHeight="23.0" fitWidth="52.0" layoutX="10.0" layoutY="45.0" onMousePressed="#search">

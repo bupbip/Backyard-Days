@@ -8,16 +8,16 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        primaryStage = primaryStage;
         primaryStage.getIcons().add(new Image("https://thumbs.dreamstime.com/b/vector-pixel-art-watering-tree-isolated-cartoon-vector-pixel-art-watering-tree-122893540.jpg"));
         Parent root = null;
         try {
-            root = FXMLLoader.load(getClass().getResource("sample.fxml"));
+            root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("sample.fxml")));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -26,19 +26,6 @@ public class Main extends Application {
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
-
-/*    public static void switchScenes(Scene scene){
-        primaryStage.setScene(scene);
-    }
-    public static void switchScenesBack(){
-        Parent root = null;
-        try {
-            root = FXMLLoader.load(Main.class.getResource("sample.fxml"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        primaryStage.setScene(new Scene(root));
-    }*/
 
     public static void main(String[] args) {
         launch(args);
