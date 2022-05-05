@@ -1,6 +1,8 @@
 package sample;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -8,14 +10,19 @@ import java.time.format.ResolverStyle;
 import java.util.*;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
-import javafx.scene.Cursor;
+import javafx.geometry.VPos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -25,7 +32,7 @@ import org.jsoup.select.Elements;
 
 
 public class Controller {
-
+    public static Calendar today = new GregorianCalendar();
     public static int month;
     public static int year;
     private static Map<Integer,String> currMonthForecast = new HashMap<>();
@@ -126,9 +133,12 @@ public class Controller {
             for (Integer k : setKeys) {
                 int dayOfWeek = days.get(k);
                 if (dayOfWeek == 5 || dayOfWeek == 6) {
-                    addButtons(k, days.get(k), week, "red");
+                    addButtons(k, days.get(k), week, "-fx-text-fill: red;", "");
                 } else {
-                    addButtons(k, days.get(k), week, "white");
+                    addButtons(k, days.get(k), week, "-fx-text-fill: white;", "");
+                }
+                if (today.get(Calendar.DAY_OF_MONTH) == k && today.get(Calendar.MONTH) == month && today.get(Calendar.YEAR) == year) {
+                    addButtons(k, days.get(k), week, "-fx-text-fill: transparent;", "; -fx-border-color: red; -fx-border-width: 2px");
                 }
                 if (dayOfWeek == 6) week++;
             }
@@ -149,6 +159,7 @@ public class Controller {
         }
         return week;
     }
+
 
     public void fillCalendar() {
         Map<Integer, Integer> currMonth = getCurrMonth();
@@ -199,12 +210,12 @@ public class Controller {
     }
 
 
-    public void addButtons(int day, int col, int row, String color) {
-        String currentDate = String.format("%02d.%02d.%d", day, month + 1, year);
+    public void addButtons(int day, int col, int row, String color, String border) {
+        String currentDate = String.format("%02d.%02d.%d", day, month, year);
         Button button = new Button(String.valueOf(day));
         button.setMaxWidth(Double.MAX_VALUE);
         button.setMaxHeight(Double.MAX_VALUE);
-        button.setStyle("-fx-background-color: transparent; -fx-text-fill: " + color + "; -fx-font-size: 25px");
+        button.setStyle("-fx-background-color: transparent; " + color + " -fx-font-size: 25px" + border);
         button.setId(currentDate);
         GridPane.setConstraints(button, col, row);
         gridPane.getChildren().add(button);
@@ -212,7 +223,14 @@ public class Controller {
         button.setOnAction(e -> {
             cellSelected();
             System.out.println(currentDate);
-            System.out.println(currMonthForecast.get(day - 1));
+            Scene scene2 = null;
+            try {
+                scene2 = new Scene(FXMLLoader.load(getClass().getResource("sample2.fxml")));
+            } catch (IOException a) {
+                a.printStackTrace();//переписать
+            }
+            Scene finalScene = scene2;
+            Main.switchScenes(finalScene);
         });
     }
 
@@ -271,4 +289,4 @@ public class Controller {
         }
         return forecastCurrentMonth;
     }
-}
+//внедриться в getcurrmonth
