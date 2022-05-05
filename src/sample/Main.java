@@ -13,6 +13,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        primaryStage = primaryStage;
         primaryStage.getIcons().add(new Image("https://thumbs.dreamstime.com/b/vector-pixel-art-watering-tree-isolated-cartoon-vector-pixel-art-watering-tree-122893540.jpg"));
         Parent root = null;
         try {
