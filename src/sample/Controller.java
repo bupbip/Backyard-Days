@@ -1,9 +1,15 @@
 package sample;
 
+import java.io.IOException;
+import java.time.Month;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.util.*;
 
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -13,11 +19,16 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
+
 
 public class Controller {
 
     public static int month;
     public static int year;
+    private static Map<Integer,String> currMonthForecast = new HashMap<>();
 
     @FXML
     private Label currMonth;
@@ -27,11 +38,15 @@ public class Controller {
 
     @FXML
     private AnchorPane anchorPane;
+    
+    @FXML
+    private TextField toSearch;
 
     @FXML
     private GridPane gridPane;
 
     @FXML
+
     private ImageView backgroundImage;
 
     @FXML
@@ -42,6 +57,10 @@ public class Controller {
 
     @FXML
     private ImageView prevMonthButton;
+  
+    @FXML
+    private Button backToCalendar;
+
 
     public void initialize() {
         month = Calendar.getInstance().get(Calendar.MONTH);
@@ -50,14 +69,7 @@ public class Controller {
     }
 
     public Map<Integer, Integer> getCurrMonth() {
-        if (month == 12) {
-            month = 0;
-            ++year;
-        }
-        if (month == -1) {
-            month = 11;
-            --year;
-        }
+        updateYear();
         currMonth.setText(Months.values()[month].toString() + " " + year);
         Map<Integer, Integer> dayToMonth = new HashMap<>();
         Calendar maxDays = new GregorianCalendar(year, month, 1);
@@ -72,6 +84,7 @@ public class Controller {
     }
 
     public Map<Integer, Integer> getDaysBefore(Map<Integer, Integer> dayToMonth) {
+        updateYear();
         Map<Integer, Integer> dayToMonthBefore = new HashMap<>();
         Calendar maxDays = new GregorianCalendar(year, month - 1, 1);
         int days = maxDays.getActualMaximum(Calendar.DAY_OF_MONTH);
@@ -84,6 +97,7 @@ public class Controller {
     }
 
     public Map<Integer, Integer> getDaysAfter(Map<Integer, Integer> dayToMonth) {
+        updateYear();
         Map<Integer, Integer> dayToMonthAfter = new HashMap<>();
         Calendar maxDays = new GregorianCalendar(year, month, 1);
         int days = maxDays.getActualMaximum(Calendar.DAY_OF_MONTH);
@@ -93,6 +107,17 @@ public class Controller {
             dayToMonthAfter.put(date.get(Calendar.DAY_OF_MONTH), rightDay);
         }
         return dayToMonthAfter;
+    }
+
+    public void updateYear(){
+        if (month == 12) {
+            month = 0;
+            ++year;
+        }
+        if (month == -1) {
+            month = 11;
+            --year;
+        }
     }
 
     public int addPanel(Map<Integer, Integer> days, int week, boolean clickable) {
@@ -133,6 +158,7 @@ public class Controller {
         week = addPanel(dayToMonthBefore, week, false);
         week = addPanel(currMonth, week, true);
         addPanel(dayToMonthAfter, week, false);
+        currMonthForecast = getWeather();
     }
 
     public void toLowerMonth() {
@@ -147,6 +173,25 @@ public class Controller {
         fillCalendar();
     }
 
+    public void search() {
+        try {
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.uuuu").withResolverStyle(ResolverStyle.STRICT);
+            dateFormatter.parse(toSearch.getText());
+            String[] searchArray;
+            searchArray = toSearch.getText().split("[.]");
+            int searchMonth = Integer.parseInt(searchArray[0]);
+            int searchYear = Integer.parseInt(searchArray[1]);
+            month = searchMonth - 1;
+            year = searchYear;
+            clearGridPane();
+            fillCalendar();
+        } catch (DateTimeParseException e) {
+            System.out.println("Date is not valid");
+        } finally {
+            toSearch.setText("");
+        }
+    }
+
     public void clearGridPane() {
         Node node = gridPane.getChildren().get(0);
         gridPane.getChildren().clear();
@@ -155,7 +200,7 @@ public class Controller {
 
 
     public void addButtons(int day, int col, int row, String color) {
-        String currentDate = String.format("%02d:%02d:%d", day, month, year);
+        String currentDate = String.format("%02d.%02d.%d", day, month + 1, year);
         Button button = new Button(String.valueOf(day));
         button.setMaxWidth(Double.MAX_VALUE);
         button.setMaxHeight(Double.MAX_VALUE);
@@ -163,9 +208,11 @@ public class Controller {
         button.setId(currentDate);
         GridPane.setConstraints(button, col, row);
         gridPane.getChildren().add(button);
+        gridPane.setCursor(Cursor.HAND);
         button.setOnAction(e -> {
             cellSelected();
             System.out.println(currentDate);
+            System.out.println(currMonthForecast.get(day - 1));
         });
     }
 
@@ -193,5 +240,35 @@ public class Controller {
 
     private void chosenDate() {
 
+    }
+}
+    private Map<Integer, String> getWeather() {
+        String urlString = "https://world-weather.ru/pogoda/russia/moscow/" + Month.of(month + 1).name() + "-" + year + "/";
+        System.out.println(urlString);
+        ArrayList<String> celsius = new ArrayList<>();
+        ArrayList<String> weather = new ArrayList<>();
+        Map<Integer,String> forecastCurrentMonth = new HashMap<>();
+        try {
+            Document page = Jsoup.connect(urlString).get();
+            Elements weatherDays = page.getElementsByClass("ww-month");
+            String[] forecast = page.select(".ww-month").toString().split("=");
+            String[] monthWeatherString = weatherDays.text().split(" ");
+            int dayNum = 1;
+            for (int i = 0; i < monthWeatherString.length; i += 2) {
+                celsius.add(monthWeatherString[i].replaceFirst(dayNum + "", ""));
+                dayNum++;
+            }
+            for (int i = 0; i < forecast.length; i++) {
+                if(forecast[i].endsWith("title")){
+                    weather.add(forecast[i+1].replace(" class",""));
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        for (int i = 0; i < celsius.size(); i++) {
+            forecastCurrentMonth.put(i, celsius.get(i) + " " + weather.get(i));
+        }
+        return forecastCurrentMonth;
     }
 }
