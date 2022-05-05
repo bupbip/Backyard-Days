@@ -27,6 +27,19 @@ public class Main extends Application {
         primaryStage.show();
     }
 
+/*    public static void switchScenes(Scene scene){
+        primaryStage.setScene(scene);
+    }
+    public static void switchScenesBack(){
+        Parent root = null;
+        try {
+            root = FXMLLoader.load(Main.class.getResource("sample.fxml"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        primaryStage.setScene(new Scene(root));
+    }*/
+
     public static void main(String[] args) {
         launch(args);
     }

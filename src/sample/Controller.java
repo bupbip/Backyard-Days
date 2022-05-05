@@ -17,6 +17,9 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.effect.GaussianBlur;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.control.TextField;
@@ -38,13 +41,33 @@ public class Controller {
     private Label currMonth;
 
     @FXML
+    private ImageView exitButton;
+
+    @FXML
+    private AnchorPane anchorPane;
+    
+    @FXML
     private TextField toSearch;
 
     @FXML
     private GridPane gridPane;
 
     @FXML
+
+    private ImageView backgroundImage;
+
+    @FXML
+    private Label daysOfWeekLabel;
+
+    @FXML
+    private ImageView nextMonthButton;
+
+    @FXML
+    private ImageView prevMonthButton;
+  
+    @FXML
     private Button backToCalendar;
+
 
     public void initialize() {
         month = Calendar.getInstance().get(Calendar.MONTH);
@@ -198,6 +221,7 @@ public class Controller {
         gridPane.getChildren().add(button);
         gridPane.setCursor(Cursor.HAND);
         button.setOnAction(e -> {
+            cellSelected();
             System.out.println(currentDate);
             Scene scene2 = null;
             try {
@@ -210,11 +234,32 @@ public class Controller {
         });
     }
 
-
-    public void cellSelected(String currentDate) {
-   
+    public void cellSelected() {
+        blur(true, backgroundImage, gridPane, daysOfWeekLabel, nextMonthButton, prevMonthButton);
+        exitButton.setVisible(true);
+        chosenDate();
+        exitButton.setOnMouseClicked(t -> {
+            blur(false, backgroundImage, gridPane, daysOfWeekLabel, nextMonthButton, prevMonthButton);
+            clearGridPane();
+            fillCalendar();
+            exitButton.setVisible(false);
+        });
     }
 
+    public void blur(boolean blur, Node... objects) {
+        if(blur){
+            Arrays.stream(objects).forEach(obj -> obj.setEffect(new GaussianBlur()));
+            Arrays.stream(objects).forEach(obj -> obj.setDisable(blur));
+        } else {
+            Arrays.stream(objects).forEach(obj -> obj.setEffect(null));
+            Arrays.stream(objects).forEach(obj -> obj.setDisable(blur));
+        }
+    }
+
+    private void chosenDate() {
+
+    }
+}
     private Map<Integer, String> getWeather() {
         String urlString = "https://world-weather.ru/pogoda/russia/moscow/" + Month.of(month + 1).name() + "-" + year + "/";
         System.out.println(urlString);
@@ -244,6 +289,4 @@ public class Controller {
         }
         return forecastCurrentMonth;
     }
-}
-
 //внедриться в getcurrmonth
