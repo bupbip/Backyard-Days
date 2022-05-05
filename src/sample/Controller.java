@@ -18,17 +18,25 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
+
 
 public class Controller {
     public static Calendar today = new GregorianCalendar();
     public static int month;
     public static int year;
+    private static Map<Integer,String> currMonthForecast = new HashMap<>();
 
     @FXML
     private Label currMonth;
 
     @FXML
     private GridPane gridPane;
+
+    @FXML
+    private Button backToCalendar;
 
     public void initialize() {
         month = Calendar.getInstance().get(Calendar.MONTH);
@@ -37,14 +45,7 @@ public class Controller {
     }
 
     public Map<Integer, Integer> getCurrMonth() {
-        if (month == 12) {
-            month = 0;
-            ++year;
-        }
-        if (month == -1) {
-            month = 11;
-            --year;
-        }
+        updateYear();
         currMonth.setText(Months.values()[month].toString() + " " + year);
         Map<Integer, Integer> dayToMonth = new HashMap<>();
         Calendar maxDays = new GregorianCalendar(year, month, 1);
@@ -59,6 +60,7 @@ public class Controller {
     }
 
     public Map<Integer, Integer> getDaysBefore(Map<Integer, Integer> dayToMonth) {
+        updateYear();
         Map<Integer, Integer> dayToMonthBefore = new HashMap<>();
         Calendar maxDays = new GregorianCalendar(year, month - 1, 1);
         int days = maxDays.getActualMaximum(Calendar.DAY_OF_MONTH);
@@ -71,6 +73,7 @@ public class Controller {
     }
 
     public Map<Integer, Integer> getDaysAfter(Map<Integer, Integer> dayToMonth) {
+        updateYear();
         Map<Integer, Integer> dayToMonthAfter = new HashMap<>();
         Calendar maxDays = new GregorianCalendar(year, month, 1);
         int days = maxDays.getActualMaximum(Calendar.DAY_OF_MONTH);
@@ -82,16 +85,24 @@ public class Controller {
         return dayToMonthAfter;
     }
 
+    public void updateYear(){
+        if (month == 12) {
+            month = 0;
+            ++year;
+        }
+        if (month == -1) {
+            month = 11;
+            --year;
+        }
+    }
+
     public int addPanel(Map<Integer, Integer> days, int week, boolean clickable) {
         Set<Integer> setKeys = days.keySet();
-
-
         if (clickable) {
             for (Integer k : setKeys) {
                 int dayOfWeek = days.get(k);
                 if (dayOfWeek == 5 || dayOfWeek == 6) {
                     addButtons(k, days.get(k), week, "-fx-text-fill: red;", "");
-
                 } else {
                     addButtons(k, days.get(k), week, "-fx-text-fill: white;", "");
                 }
@@ -127,6 +138,7 @@ public class Controller {
         week = addPanel(dayToMonthBefore, week, false);
         week = addPanel(currMonth, week, true);
         addPanel(dayToMonthAfter, week, false);
+        currMonthForecast = getWeather();
     }
 
     public void toLowerMonth() {
@@ -157,6 +169,7 @@ public class Controller {
         button.setId(currentDate);
         GridPane.setConstraints(button, col, row);
         gridPane.getChildren().add(button);
+        gridPane.setCursor(Cursor.HAND);
         button.setOnAction(e -> {
             System.out.println(currentDate);
             Scene scene2 = null;
@@ -172,70 +185,37 @@ public class Controller {
 
 
     public void cellSelected(String currentDate) {
-        clearGridPane();
-//        AnchorPane newPane = new AnchorPane();
-//        root.setTop(newPane);
-        Button buttonBack = createBackButton();
-        TextArea notes = createNotesArea();
-        Text date = createDateText(currentDate);
-        Text textNote = createNoteText();
-//        buttonBack.setOnAction(t -> {
-//            gridPane.getChildren().remove(buttonBack);
-//            gridPane.getChildren().remove(date);
-//            gridPane.getChildren().remove(notes);
-//            gridPane.getChildren().remove(textNote);
-//            fillCalendar();
-//        });
-        buttonBack.setOnAction(t -> {
-            Scene scene2 = null;
-            try {
-                scene2 = new Scene(FXMLLoader.load(getClass().getResource("sample2.fxml")));
-            } catch (IOException e) {
-                e.printStackTrace();
+   
+    }
+
+    private Map<Integer, String> getWeather() {
+        String urlString = "https://world-weather.ru/pogoda/russia/moscow/" + Month.of(month + 1).name() + "-" + year + "/";
+        System.out.println(urlString);
+        ArrayList<String> celsius = new ArrayList<>();
+        ArrayList<String> weather = new ArrayList<>();
+        Map<Integer,String> forecastCurrentMonth = new HashMap<>();
+        try {
+            Document page = Jsoup.connect(urlString).get();
+            Elements weatherDays = page.getElementsByClass("ww-month");
+            String[] forecast = page.select(".ww-month").toString().split("=");
+            String[] monthWeatherString = weatherDays.text().split(" ");
+            int dayNum = 1;
+            for (int i = 0; i < monthWeatherString.length; i += 2) {
+                celsius.add(monthWeatherString[i].replaceFirst(dayNum + "", ""));
+                dayNum++;
             }
-
-            Scene finalScene = scene2;
-            Main.switchScenes(finalScene);
-        });
-    }
-
-    private Button createBackButton() {
-        Button buttonBack = new Button("X");
-        buttonBack.setMaxWidth(10);
-        buttonBack.setMaxHeight(10);
-        buttonBack.setStyle("-fx-background-color: red;");
-        GridPane.setConstraints(buttonBack, 6, 0);
-        GridPane.setHalignment(buttonBack, HPos.RIGHT);
-        GridPane.setValignment(buttonBack, VPos.TOP);
-        gridPane.getChildren().add(buttonBack);
-        return buttonBack;
-    }
-
-    private Text createDateText(String currentDate) {
-        Text date = new Text(currentDate);
-        date.setStyle("-fx-font-size: 50;");
-        date.setFill(Color.WHITE);
-        GridPane.setValignment(date, VPos.CENTER);
-        gridPane.setConstraints(date, 0, 0);
-        gridPane.getChildren().add(date);
-        return date;
-    }
-
-    private TextArea createNotesArea() {
-        TextArea textArea = new TextArea();
-        gridPane.setConstraints(textArea, 4, 3, 4, 5);
-        gridPane.getChildren().add(textArea);
-        return textArea;
-    }
-
-    private Text createNoteText() {
-        Text textNote = new Text("Заметки");
-        textNote.setStyle("-fx-font-size: 45;");
-        textNote.setFill(Color.WHITE);
-        GridPane.setHalignment(textNote, HPos.CENTER);
-        gridPane.setConstraints(textNote, 3, 1);
-        gridPane.getChildren().add(textNote);
-        return textNote;
+            for (int i = 0; i < forecast.length; i++) {
+                if(forecast[i].endsWith("title")){
+                    weather.add(forecast[i+1].replace(" class",""));
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        for (int i = 0; i < celsius.size(); i++) {
+            forecastCurrentMonth.put(i, celsius.get(i) + " " + weather.get(i));
+        }
+        return forecastCurrentMonth;
     }
 }
 
