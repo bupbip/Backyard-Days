@@ -9,16 +9,14 @@ import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.effect.GaussianBlur;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
-
-import static sample.Files.addToFile;
 
 public class Controller {
     public static Calendar today = new GregorianCalendar();
@@ -49,7 +47,6 @@ public class Controller {
 
     @FXML
     private ImageView prevMonthButton;
-
 
 
     public void initialize() {
@@ -112,30 +109,40 @@ public class Controller {
 
     public int addPanel(Map<Integer, Integer> days, int week, boolean clickable) {
         Set<Integer> setKeys = days.keySet();
+        String blockType = "stone";
         if (clickable) {
             for (Integer k : setKeys) {
+                if (currMonthForecast.get(k - 1).toLowerCase().contains("снег")) {
+                    blockType = "snowblock";
+                } else if (currMonthForecast.get(k - 1).contains("осадки") || currMonthForecast.get(k - 1).contains("дождь")) {
+                    blockType = "waterearthblock";
+                } else if (currMonthForecast.get(k - 1).toLowerCase().contains("ясно") || currMonthForecast.get(k - 1).toLowerCase().contains("облачно")) {
+                    blockType = "earthblock";
+                }
                 int dayOfWeek = days.get(k);
                 if (dayOfWeek == 5 || dayOfWeek == 6) {
-                    addButtons(k, days.get(k), week, "-fx-text-fill: red;", "");
+                    addButtons(k, days.get(k), week, blockType, Color.FIREBRICK, false);
                 } else {
-                    addButtons(k, days.get(k), week, "-fx-text-fill: white;", "");
+                    addButtons(k, days.get(k), week, blockType, Color.WHITE, false);
                 }
                 if (today.get(Calendar.DAY_OF_MONTH) == k && today.get(Calendar.MONTH) == month && today.get(Calendar.YEAR) == year) {
-                    addButtons(k, days.get(k), week, "-fx-text-fill: transparent;", "; -fx-border-color: red; -fx-border-width: 2px");
+                    addButtons(k, days.get(k), week, blockType, Color.LIME, true);
                 }
                 if (dayOfWeek == 6) week++;
             }
         } else {
             for (Integer k : setKeys) {
+                ImageView block = new ImageView(new Image("images/" + blockType + ".jpg"));
                 int dayOfWeek = days.get(k);
                 Text text = new Text(String.valueOf(k));
                 text.setStyle("-fx-font-size: 25px");
                 GridPane.setHalignment(text, HPos.CENTER);
                 if (dayOfWeek == 5 || dayOfWeek == 6) {
-                    text.setFill(Color.CORAL);
+                    text.setFill(Color.RED);
                 } else {
-                    text.setFill(Color.GRAY);
+                    text.setFill(Color.WHITE);
                 }
+                gridPane.add(block, dayOfWeek, week);
                 gridPane.add(text, dayOfWeek, week);
                 if (dayOfWeek == 6) week++;
             }
@@ -149,10 +156,10 @@ public class Controller {
         Map<Integer, Integer> dayToMonthBefore = getDaysBefore(currMonth);
         Map<Integer, Integer> dayToMonthAfter = getDaysAfter(currMonth);
         int week = 0;
+        currMonthForecast = Weather.getWeather(month, year);
         week = addPanel(dayToMonthBefore, week, false);
         week = addPanel(currMonth, week, true);
         addPanel(dayToMonthAfter, week, false);
-        currMonthForecast = Weather.getWeather(month,year);
     }
 
     public void toLowerMonth() {
@@ -193,17 +200,22 @@ public class Controller {
     }
 
 
-    public void addButtons(int day, int col, int row, String color, String border) {
+    public void addButtons(int day, int col, int row, String blockType, Color color, boolean border) {
         String currentDate = String.format("%02d.%02d.%d", day, month + 1, year);
-        Button button = new Button(String.valueOf(day));
-        button.setMaxWidth(Double.MAX_VALUE);
-        button.setMaxHeight(Double.MAX_VALUE);
-        button.setStyle("-fx-background-color: transparent; " + color + " -fx-font-size: 25px" + border);
+        ImageView button = new ImageView(new Image("images/" + blockType + ".jpg"));
+        if (border) {
+            button.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(255,0,0,0.8), 10, 0, 0, 0);");
+        }
+        Text date = new Text(String.valueOf(day));
+        date.setStyle("-fx-font-size: 25px/*; -fx-stroke-color: black; -fx-stroke-width: 1px*/");
+        GridPane.setHalignment(date, HPos.CENTER);
+        date.setFill(color);
         button.setId(currentDate);
         GridPane.setConstraints(button, col, row);
         gridPane.getChildren().add(button);
+        gridPane.add(date, col, row);
         gridPane.setCursor(Cursor.HAND);
-        button.setOnAction(e -> {
+        button.setOnMouseClicked(e -> {
             cellSelected();
             System.out.println(currentDate);
             System.out.println(currMonthForecast.get(day - 1));
