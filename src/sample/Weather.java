@@ -17,11 +17,11 @@ import static sample.Files.searchInFile;
 public class Weather {
 
     public static Map<Integer, String> getWeather(int month, int year) {
-        month++;
+        month += 1;
         String currentMonth = Month.of(month).name() + "-" + year;
         String fileWeather = searchInFile("forecast", currentMonth);
         Map<Integer, String> forecastCurrentMonth = new HashMap<>();
-        if(fileWeather == null){
+        if (fileWeather == null) {
             String urlString = "https://world-weather.ru/pogoda/russia/moscow/" + currentMonth + "/";
             System.out.println(urlString);
             ArrayList<String> celsius = new ArrayList<>();
@@ -53,7 +53,7 @@ public class Weather {
             for (int i = 0; i < monthWeather.length; i++) {
                 String degree = monthWeather[i].substring(monthWeather[i].indexOf('=') + 1, monthWeather[i].indexOf(' '));
                 String weather = monthWeather[i].substring(monthWeather[i].indexOf(' ') + 1);
-                forecastCurrentMonth.put(i,degree + " " + weather);
+                forecastCurrentMonth.put(i, degree + " " + weather);
             }
             System.out.println("взял из файла");
         }
