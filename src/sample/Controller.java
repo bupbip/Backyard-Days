@@ -9,7 +9,9 @@ import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -47,6 +49,12 @@ public class Controller {
 
     @FXML
     private ImageView prevMonthButton;
+
+    @FXML
+    private TextArea textArea;
+
+    @FXML
+    private Button buttonSave;
 
 
     public void initialize() {
@@ -121,7 +129,7 @@ public class Controller {
                 }
                 int dayOfWeek = days.get(k);
                 if (dayOfWeek == 5 || dayOfWeek == 6) {
-                    addButtons(k, days.get(k), week, blockType, Color.FIREBRICK, false);
+                    addButtons(k, days.get(k), week, blockType, Color.CYAN, false);
                 } else {
                     addButtons(k, days.get(k), week, blockType, Color.WHITE, false);
                 }
@@ -135,10 +143,11 @@ public class Controller {
                 ImageView block = new ImageView(new Image("images/" + blockType + ".jpg"));
                 int dayOfWeek = days.get(k);
                 Text text = new Text(String.valueOf(k));
-                text.setStyle("-fx-font-size: 25px");
+                text.setStyle("-fx-font-size: 35px; -fx-stroke-color: black; -fx-stroke-width: 1px");
+                text.setStroke(Color.BLACK);
                 GridPane.setHalignment(text, HPos.CENTER);
                 if (dayOfWeek == 5 || dayOfWeek == 6) {
-                    text.setFill(Color.RED);
+                    text.setFill(Color.CYAN);
                 } else {
                     text.setFill(Color.WHITE);
                 }
@@ -207,29 +216,45 @@ public class Controller {
             button.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(255,0,0,0.8), 10, 0, 0, 0);");
         }
         Text date = new Text(String.valueOf(day));
-        date.setStyle("-fx-font-size: 25px/*; -fx-stroke-color: black; -fx-stroke-width: 1px*/");
+        date.setStyle("-fx-font-size: 35px; -fx-stroke-color: black; -fx-stroke-width: 1px");
         GridPane.setHalignment(date, HPos.CENTER);
         date.setFill(color);
+        date.setStroke(Color.BLACK);
         button.setId(currentDate);
         GridPane.setConstraints(button, col, row);
         gridPane.getChildren().add(button);
         gridPane.add(date, col, row);
         gridPane.setCursor(Cursor.HAND);
         button.setOnMouseClicked(e -> {
-            cellSelected();
+            cellSelected(button.getId());
+            System.out.println(currentDate);
+            System.out.println(currMonthForecast.get(day - 1));
+        });
+        date.setOnMouseClicked(e -> {
+            cellSelected(button.getId());
             System.out.println(currentDate);
             System.out.println(currMonthForecast.get(day - 1));
         });
     }
 
-    public void cellSelected() {
+    public void cellSelected(String buttonID) {
         blur(true, backgroundImage, gridPane, daysOfWeekLabel, nextMonthButton, prevMonthButton);
         exitButton.setVisible(true);
+        textArea.setVisible(true);
+        buttonSave.setVisible(true);
+        blur(false, textArea);
+        textArea.setText(Files.searchNotesInFile("Notes", buttonID));
+        buttonSave.setOnMouseClicked(e -> {
+            Files.addNotesToFile("Notes", buttonID, buttonID + "\n" + textArea.getText() + "\nEOT\n");
+        });
         exitButton.setOnMouseClicked(t -> {
+            textArea.setText("");
             blur(false, backgroundImage, gridPane, daysOfWeekLabel, nextMonthButton, prevMonthButton);
             clearGridPane();
             fillCalendar();
             exitButton.setVisible(false);
+            textArea.setVisible(false);
+            buttonSave.setVisible(false);
         });
     }
 
@@ -241,6 +266,10 @@ public class Controller {
             Arrays.stream(objects).forEach(obj -> obj.setEffect(null));
             Arrays.stream(objects).forEach(obj -> obj.setDisable(blur));
         }
+    }
+
+    public void saveText(){
+
     }
 
 }
