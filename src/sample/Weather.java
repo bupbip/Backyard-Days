@@ -1,6 +1,5 @@
 package sample;
 
-import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -11,15 +10,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static sample.Files.addToFile;
-import static sample.Files.searchInFile;
-
 public class Weather {
+
+    /**
+     * Парсит сайт с погодой на нужный месяц и год,
+     * или если погода уже была получена выводит из файла
+     *
+     * @param month Необходимый месяц
+     * @param year  Необходимый год
+     * @return Данные о погоде и температуре или null в случае неудачи
+     */
 
     public static Map<Integer, String> getWeather(int month, int year) {
         month += 1;
         String currentMonth = Month.of(month).name() + "-" + year;
-        String fileWeather = searchInFile("forecast", currentMonth);
+        String fileWeather = FileWorker.searchWeatherInFile(currentMonth);
         Map<Integer, String> forecastCurrentMonth = new HashMap<>();
         if (fileWeather == null) {
             String urlString = "https://world-weather.ru/pogoda/russia/moscow/" + currentMonth + "/";
@@ -44,9 +49,9 @@ public class Weather {
                 for (int i = 0; i < celsius.size(); i++) {
                     forecastCurrentMonth.put(i, celsius.get(i) + " " + weather.get(i));
                 }
-                addToFile("forecast", currentMonth, String.valueOf(forecastCurrentMonth));
+                FileWorker.addWeatherToFile("forecast", currentMonth + String.valueOf(forecastCurrentMonth));
             } catch (IOException e) {
-                System.out.println("Ошибка");
+                return null;
             }
         } else {
             String[] monthWeather = fileWeather.split(", ");

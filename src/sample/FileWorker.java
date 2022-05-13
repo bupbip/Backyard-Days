@@ -4,22 +4,33 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
 
-public class Files {
-    public static void addToFile(String filename, String... lines) {
-        try (FileWriter writer = new FileWriter("src/files/" + filename + ".txt", true)) {
-            for (String line : lines) {
-                writer.write(line);
-            }
+public class FileWorker {
+
+    /**
+     * Добавляет погоду в файл
+     *
+     * @param line
+     */
+
+    public static void addWeatherToFile(String filename, String line) {
+        try (FileWriter writer = new FileWriter("src/files/forecast.txt", true)) {
+            writer.write(line);
             writer.write("\n");
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
     }
 
-    public static String searchInFile(String filename, String search) {
-        try (BufferedReader reader = new BufferedReader(new FileReader("src/files/" + filename + ".txt"))) {
+    /**
+     * Ищет погоду по нужной дате в файле
+     *
+     * @param search Дата, для поиска
+     * @return Строка с нужной погодой
+     */
+
+    public static String searchWeatherInFile(String search) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/files/forecast.txt"))) {
             String line = reader.readLine();
             while (line != null) {
                 if (line.startsWith(search)) {
@@ -28,22 +39,28 @@ public class Files {
                 line = reader.readLine();
             }
         } catch (IOException ex) {
-
             System.out.println(ex.getMessage());
         }
         return null;
     }
 
-    public static String searchNotesInFile(String filename, String search) {
-        try (BufferedReader reader = new BufferedReader(new FileReader("src/files/" + filename + ".txt"))) {
+    /**
+     * Ищет заметки по нужной дате
+     *
+     * @param search Дата для поиска
+     * @return Заметки на текущий день или null при их отсутствии
+     */
+
+    public static String searchNotesInFile(String search) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/files/notes.txt"))) {
             String line = reader.readLine();
             boolean write = false;
             StringBuilder lines = new StringBuilder();
             while (line != null) {
-                if(line.equals("EOT")) {
+                if (line.equals("EOT")) {
                     write = false;
                 }
-                if(write) {
+                if (write) {
                     lines.append(line).append("\n");
                 }
                 if (line.startsWith(search)) {
@@ -53,17 +70,23 @@ public class Files {
             }
             return lines.toString();
         } catch (IOException ex) {
-
             System.out.println(ex.getMessage());
         }
         return null;
     }
 
-    public static void addNotesToFile(String filename,String buttonID, String newNote) {
-        try (BufferedReader reader = new BufferedReader(new FileReader("src/files/" + filename + ".txt"))) {
+    /**
+     * Добавляет заметки в файл на нужную дату
+     *
+     * @param buttonID Дата
+     * @param newNote  Заметки для добавления
+     */
+
+    public static void addNotesToFile(String buttonID, String newNote) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/files/notes.txt"))) {
             String line = reader.readLine();
             boolean save = true;
-            StringBuilder savedNotes = new StringBuilder();
+            StringBuilder savedNotes = new StringBuilder(buttonID);
             while (line != null) {
                 if (line.equals(buttonID)) {
                     save = false;
@@ -77,12 +100,11 @@ public class Files {
                 line = reader.readLine();
             }
             savedNotes.append(newNote);
-        try (FileWriter writer = new FileWriter("src/files/" + filename + ".txt", false)) {
-            writer.write(savedNotes.toString());
-        }
+            try (FileWriter writer = new FileWriter("src/files/notes.txt", false)) {
+                writer.write(savedNotes.toString());
+            }
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
     }
-
 }
