@@ -86,12 +86,12 @@ public class FileWorker {
         try (BufferedReader reader = new BufferedReader(new FileReader("src/files/notes.txt"))) {
             String line = reader.readLine();
             boolean save = true;
-            StringBuilder savedNotes = new StringBuilder(buttonID);
+            StringBuilder savedNotes = new StringBuilder();
             while (line != null) {
                 if (line.equals(buttonID)) {
                     save = false;
                 }
-                if (save) {
+                if (save && !line.equals("\n")) {
                     savedNotes.append(line).append("\n");
                 }
                 if (line.equals("EOT")) {
@@ -99,7 +99,7 @@ public class FileWorker {
                 }
                 line = reader.readLine();
             }
-            savedNotes.append(newNote);
+            savedNotes.append(buttonID + newNote + "\n");
             try (FileWriter writer = new FileWriter("src/files/notes.txt", false)) {
                 writer.write(savedNotes.toString());
             }
