@@ -1,7 +1,5 @@
 package sample;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.*;
 
 import javafx.fxml.FXML;
@@ -11,7 +9,6 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
-import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.control.TextField;
@@ -29,15 +26,13 @@ public class Controller {
     private static int month;
     private static int year;
     private static Map<Integer, String> currMonthForecast = new HashMap<>();
+    private Weather weather;
 
     @FXML
     private Label currMonth;
 
     @FXML
     private ImageView exitButton;
-
-    @FXML
-    private TextField toSearch;
 
     @FXML
     private GridPane gridPane;
@@ -58,7 +53,31 @@ public class Controller {
     private TextArea textArea;
 
     @FXML
-    private Button buttonSave;
+    private ImageView saveButton;
+
+    @FXML
+    private ImageView dayMenuImage;
+
+    @FXML
+    private ImageView placeToBlockImage;
+
+    @FXML
+    private ImageView resetButton;
+
+    @FXML
+    private ImageView updateText;
+
+    @FXML
+    private TextField toSearch;
+
+    @FXML
+    private ImageView searchButton;
+
+    @FXML
+    private ImageView toSearchImage;
+
+    @FXML
+    private ImageView flower;
 
     /**
      * Выполняется при запуске, задаёт текущие месяц и год в актуальные
@@ -67,6 +86,7 @@ public class Controller {
     public void initialize() {
         month = Calendar.getInstance().get(Calendar.MONTH);
         year = Calendar.getInstance().get(Calendar.YEAR);
+        weather = new Weather();
         fillCalendar();
     }
 
@@ -76,7 +96,7 @@ public class Controller {
      *
      * @return Мапу, где ключ - день месяца, значение - день недели, который он занимает
      */
-    // создаёт надпись в левом верхнем углу, распределяет дни месяца по дням недели
+
     public Map<Integer, Integer> getCurrMonth() {
         updateYear();
         currMonth.setText(Months.values()[month].toString() + " " + year);
@@ -98,6 +118,7 @@ public class Controller {
      * @param dayToMonth Мапа дней текущего месяца, с учтенными днями недели
      * @return Мапу последних дат предыдущего месяца
      */
+
     public Map<Integer, Integer> getDaysBefore(Map<Integer, Integer> dayToMonth) {
         updateYear();
         Map<Integer, Integer> dayToMonthBefore = new HashMap<>();
@@ -184,7 +205,7 @@ public class Controller {
             }
         } else {
             for (Integer k : setKeys) {
-                ImageView block = new ImageView(new Image("images/" + blockType + ".jpg"));
+                ImageView block = new ImageView(new Image("images/blocks/" + blockType + ".jpg"));
                 int dayOfWeek = days.get(k);
                 Text text = new Text(String.valueOf(k));
                 text.setStyle("-fx-font-size: 35px; -fx-stroke-color: black; -fx-stroke-width: 1px");
@@ -215,7 +236,7 @@ public class Controller {
         Map<Integer, Integer> dayToMonthBefore = getDaysBefore(currMonth);
         Map<Integer, Integer> dayToMonthAfter = getDaysAfter(currMonth);
         int week = 0;
-        currMonthForecast = Weather.getWeather(month, year);
+        currMonthForecast = weather.getWeather(month, year);
         week = addPanel(dayToMonthBefore, week, false);
         week = addPanel(currMonth, week, true);
         addPanel(dayToMonthAfter, week, false);
@@ -283,83 +304,33 @@ public class Controller {
 
     public void addButtons(int day, int col, int row, String blockType, Color color) {
         String currentDate = String.format("%02d.%02d.%d", day, month + 1, year);
-        ImageView button = new ImageView(new Image("images/" + blockType + ".jpg"));
+        ImageView button = new ImageView(new Image("images/blocks/" + blockType + ".jpg"));
         Text date = new Text(String.valueOf(day));
         date.setStyle("-fx-font-size: 35px; -fx-stroke-color: black; -fx-stroke-width: 1px");
         GridPane.setHalignment(date, HPos.CENTER);
         date.setFill(color);
         date.setStroke(Color.BLACK);
-        button.setId(currentDate);
+        button.setId(currentDate + "," + blockType);
         GridPane.setConstraints(button, col, row);
         gridPane.getChildren().add(button);
         gridPane.add(date, col, row);
         gridPane.setCursor(Cursor.HAND);
+        DayMenu thisDayMenu = new DayMenu();
         button.setOnMouseClicked(e -> {
-            cellSelected(button.getId());
+            thisDayMenu.cellSelected(button.getId(), placeToBlockImage, flower, dayMenuImage, exitButton, textArea, saveButton, backgroundImage, gridPane, daysOfWeekLabel, nextMonthButton, prevMonthButton, toSearch, searchButton, resetButton, updateText, toSearchImage);
             System.out.println(currentDate);
             System.out.println(currMonthForecast.get(day - 1));
         });
         date.setOnMouseClicked(e -> {
-            cellSelected(button.getId());
+            thisDayMenu.cellSelected(button.getId(), placeToBlockImage, flower, dayMenuImage, exitButton, textArea, saveButton, backgroundImage, gridPane, daysOfWeekLabel, nextMonthButton, prevMonthButton, toSearch, searchButton, resetButton, updateText, toSearchImage);
             System.out.println(currentDate);
             System.out.println(currMonthForecast.get(day - 1));
         });
     }
 
-    /**
-     * Открываем меню дня, доступ к заметкам, запрещает нажимать кнопки
-     *
-     * @param buttonID Айди кнопки(дата)
-     */
-
-    public void cellSelected(String buttonID) {
-        blur(true, backgroundImage, gridPane, daysOfWeekLabel, nextMonthButton, prevMonthButton);
-        exitButton.setVisible(true);
-        textArea.setVisible(true);
-        buttonSave.setVisible(true);
-        blur(false, textArea);
-        textArea.setText(FileWorker.searchNotesInFile(buttonID));
-        buttonSave.setOnMouseClicked(e -> {
-            FileWorker.addNotesToFile(buttonID, "\n" + textArea.getText() + "\nEOT\n");
-        });
-        exitButton.setOnMouseClicked(t -> {
-            textArea.setText("");
-            blur(false, backgroundImage, gridPane, daysOfWeekLabel, nextMonthButton, prevMonthButton);
-            clearGridPane();
-            fillCalendar();
-            exitButton.setVisible(false);
-            textArea.setVisible(false);
-            buttonSave.setVisible(false);
-        });
-    }
-
-    /**
-     * Блюрит и разблюривает фон
-     *
-     * @param blur    Блюрить или разблюрить
-     * @param objects Объекты, которые нужно отключить
-     */
-
-    public void blur(boolean blur, Node... objects) {
-        if (blur) {
-            Arrays.stream(objects).forEach(obj -> obj.setEffect(new GaussianBlur()));
-            Arrays.stream(objects).forEach(obj -> obj.setDisable(blur));
-        } else {
-            Arrays.stream(objects).forEach(obj -> obj.setEffect(null));
-            Arrays.stream(objects).forEach(obj -> obj.setDisable(blur));
-        }
-    }
-
-    /**
-     * Очищает файл с погодой
-     */
-
-    public void clearForecast() {
-        try (FileWriter writer = new FileWriter("src/files/forecast.txt", false)) {
-            writer.write("");
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        }
+    @FXML
+    private void clearForecast() {
+        weather.clearForecast();
     }
 
 }

@@ -4,6 +4,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.time.Month;
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ public class Weather {
      * @return Данные о погоде и температуре или null в случае неудачи
      */
 
-    public static Map<Integer, String> getWeather(int month, int year) {
+    public Map<Integer, String> getWeather(int month, int year) {
         month += 1;
         String currentMonth = Month.of(month).name() + "-" + year;
         String fileWeather = FileWorker.searchWeatherInFile(currentMonth);
@@ -63,5 +64,17 @@ public class Weather {
             System.out.println("взял из файла");
         }
         return forecastCurrentMonth;
+    }
+
+    /**
+     * Очищает файл с погодой
+     */
+
+    public void clearForecast() {
+        try (FileWriter writer = new FileWriter("src/files/forecast.txt", false)) {
+            writer.write("");
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
     }
 }
