@@ -6,7 +6,6 @@ import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
@@ -78,6 +77,12 @@ public class Controller {
 
     @FXML
     private ImageView flower;
+
+    @FXML
+    private Text currentDateField;
+
+    @FXML
+    private ImageView rainGif;
 
     /**
      * Выполняется при запуске, задаёт текущие месяц и год в актуальные
@@ -182,37 +187,38 @@ public class Controller {
         Set<Integer> setKeys = days.keySet();
         String blockType = "stone";
         if (clickable) {
-            for (Integer k : setKeys) {
+            for (Integer day : setKeys) {
                 if (currMonthForecast == null) {
                     blockType = "earthblock";
-                } else if (currMonthForecast.get(k - 1).toLowerCase().contains("снег")) {
+                } else if (isContains(day - 1, "снег")) {
                     blockType = "snowblock";
-                } else if (currMonthForecast.get(k - 1).contains("осадки") || currMonthForecast.get(k - 1).contains("дождь")) {
+                } else if (isContains(day - 1, "осадки") || isContains(day - 1, "дождь")) {
                     blockType = "waterearthblock";
-                } else if (currMonthForecast.get(k - 1).toLowerCase().contains("ясно") || currMonthForecast.get(k - 1).toLowerCase().contains("облачно")) {
+                } else if (isContains(day - 1, "ясно") || isContains(day - 1, "облачно")) {
                     blockType = "earthblock";
                 }
-                int dayOfWeek = days.get(k);
+                int dayOfWeek = days.get(day);
                 if (dayOfWeek == 5 || dayOfWeek == 6) {
-                    addButtons(k, days.get(k), week, blockType, Color.CYAN);
+                    addButtons(day, days.get(day), week, blockType, Color.RED);
                 } else {
-                    addButtons(k, days.get(k), week, blockType, Color.WHITE);
+                    addButtons(day, days.get(day), week, blockType, Color.WHITE);
                 }
-                if (today.get(Calendar.DAY_OF_MONTH) == k && today.get(Calendar.MONTH) == month && today.get(Calendar.YEAR) == year) {
-                    addButtons(k, days.get(k), week, blockType, Color.LIME);
+                if (today.get(Calendar.DAY_OF_MONTH) == day && today.get(Calendar.MONTH) == month && today.get(Calendar.YEAR) == year) {
+                    addButtons(day, days.get(day), week, blockType, Color.LIME);
+                    rainGif.setVisible(currMonthForecast.get(day - 1).contains("осадки") || currMonthForecast.get(day - 1).contains("Дождь"));
                 }
                 if (dayOfWeek == 6) week++;
             }
         } else {
-            for (Integer k : setKeys) {
+            for (Integer day : setKeys) {
                 ImageView block = new ImageView(new Image("images/blocks/" + blockType + ".jpg"));
-                int dayOfWeek = days.get(k);
-                Text text = new Text(String.valueOf(k));
+                int dayOfWeek = days.get(day);
+                Text text = new Text(String.valueOf(day));
                 text.setStyle("-fx-font-size: 35px; -fx-stroke-color: black; -fx-stroke-width: 1px");
                 text.setStroke(Color.BLACK);
                 GridPane.setHalignment(text, HPos.CENTER);
                 if (dayOfWeek == 5 || dayOfWeek == 6) {
-                    text.setFill(Color.CYAN);
+                    text.setFill(Color.RED);
                 } else {
                     text.setFill(Color.WHITE);
                 }
@@ -222,6 +228,10 @@ public class Controller {
             }
         }
         return week;
+    }
+
+    public boolean isContains(int day, String weatherCondition) {
+        return currMonthForecast.get(day).toLowerCase().contains(weatherCondition);
     }
 
     /**
@@ -317,20 +327,24 @@ public class Controller {
         gridPane.setCursor(Cursor.HAND);
         DayMenu thisDayMenu = new DayMenu();
         button.setOnMouseClicked(e -> {
-            thisDayMenu.cellSelected(button.getId(), placeToBlockImage, flower, dayMenuImage, exitButton, textArea, saveButton, backgroundImage, gridPane, daysOfWeekLabel, nextMonthButton, prevMonthButton, toSearch, searchButton, resetButton, updateText, toSearchImage);
+            thisDayMenu.cellSelected(button.getId(), currentDateField, placeToBlockImage, flower, dayMenuImage, exitButton, textArea, saveButton, backgroundImage, gridPane, daysOfWeekLabel, nextMonthButton, prevMonthButton, toSearch, searchButton, resetButton, updateText, toSearchImage);
             System.out.println(currentDate);
             System.out.println(currMonthForecast.get(day - 1));
         });
         date.setOnMouseClicked(e -> {
-            thisDayMenu.cellSelected(button.getId(), placeToBlockImage, flower, dayMenuImage, exitButton, textArea, saveButton, backgroundImage, gridPane, daysOfWeekLabel, nextMonthButton, prevMonthButton, toSearch, searchButton, resetButton, updateText, toSearchImage);
+            thisDayMenu.cellSelected(button.getId(), currentDateField, placeToBlockImage, flower, dayMenuImage, exitButton, textArea, saveButton, backgroundImage, gridPane, daysOfWeekLabel, nextMonthButton, prevMonthButton, toSearch, searchButton, resetButton, updateText, toSearchImage);
             System.out.println(currentDate);
             System.out.println(currMonthForecast.get(day - 1));
         });
     }
 
+    /**
+     * Метод очищает файлик с погодой и генерирует месяц заново
+     */
+
     @FXML
     private void clearForecast() {
         weather.clearForecast();
+        fillCalendar();
     }
-
 }

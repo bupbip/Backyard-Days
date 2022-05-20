@@ -1,6 +1,7 @@
 package sample;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -83,7 +84,15 @@ public class FileWorker {
      */
 
     public static void addNotesToFile(String buttonID, String newNote) {
-        try (BufferedReader reader = new BufferedReader(new FileReader("src/files/notes.txt"))) {
+        File notesFile = new File("src/files/notes.txt");
+        if (!notesFile.exists()) {
+            try {
+                notesFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        try (BufferedReader reader = new BufferedReader(new FileReader(notesFile))) {
             String line = reader.readLine();
             boolean save = true;
             StringBuilder savedNotes = new StringBuilder();
@@ -99,7 +108,7 @@ public class FileWorker {
                 }
                 line = reader.readLine();
             }
-            savedNotes.append(buttonID + newNote + "\n");
+            savedNotes.append(buttonID).append("\n").append(newNote);
             try (FileWriter writer = new FileWriter("src/files/notes.txt", false)) {
                 writer.write(savedNotes.toString());
             }
