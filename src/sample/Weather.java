@@ -29,7 +29,6 @@ public class Weather {
         Map<Integer, String> forecastCurrentMonth = new HashMap<>();
         if (fileWeather == null) {
             String urlString = "https://world-weather.ru/pogoda/russia/moscow/" + currentMonth + "/";
-            System.out.println(urlString);
             ArrayList<String> celsius = new ArrayList<>();
             ArrayList<String> weather = new ArrayList<>();
             try {
@@ -61,7 +60,6 @@ public class Weather {
                 String weather = monthWeather[i].substring(monthWeather[i].indexOf(' ') + 1);
                 forecastCurrentMonth.put(i, degree + " " + weather);
             }
-            System.out.println("взял из файла");
         }
         return forecastCurrentMonth;
     }
