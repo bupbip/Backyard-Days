@@ -328,13 +328,9 @@ public class Controller {
         DayMenu thisDayMenu = new DayMenu();
         button.setOnMouseClicked(e -> {
             thisDayMenu.cellSelected(button.getId(), currentDateField, placeToBlockImage, flower, dayMenuImage, exitButton, textArea, saveButton, backgroundImage, gridPane, daysOfWeekLabel, nextMonthButton, prevMonthButton, toSearch, searchButton, resetButton, updateText, toSearchImage);
-            System.out.println(currentDate);
-            System.out.println(currMonthForecast.get(day - 1));
         });
         date.setOnMouseClicked(e -> {
             thisDayMenu.cellSelected(button.getId(), currentDateField, placeToBlockImage, flower, dayMenuImage, exitButton, textArea, saveButton, backgroundImage, gridPane, daysOfWeekLabel, nextMonthButton, prevMonthButton, toSearch, searchButton, resetButton, updateText, toSearchImage);
-            System.out.println(currentDate);
-            System.out.println(currMonthForecast.get(day - 1));
         });
     }
 
