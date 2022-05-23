@@ -25,6 +25,18 @@
                         <Image url="@../images/141.jpg"/>
                     </image>
                 </ImageView>
+                <ImageView fx:id="rainGif" fitHeight="743.0" fitWidth="906.0" layoutX="6.0" layoutY="1.0"
+                           pickOnBounds="true" preserveRatio="true" visible="false">
+                    <image>
+                        <Image url="@../images/дождь_задержка_0_секунд.gif"/>
+                    </image>
+                </ImageView>
+                <ImageView fitHeight="104.0" fitWidth="107.0" layoutX="478.0" layoutY="49.0" pickOnBounds="true"
+                           preserveRatio="true">
+                    <image>
+                        <Image url="@../images/farmer.gif"/>
+                    </image>
+                </ImageView>
                 <GridPane fx:id="gridPane" alignment="CENTER" cache="true" depthTest="DISABLE" gridLinesVisible="true"
                           layoutX="116.0" layoutY="159.0" prefHeight="540.0" prefWidth="630.0">
                     <columnConstraints>
@@ -156,12 +168,29 @@
                         <Font name="System Bold" size="32.0"/>
                     </font>
                 </Text>
-                <ImageView fx:id="rainGif" fitHeight="743.0" fitWidth="906.0" layoutX="6.0" layoutY="1.0"
-                           pickOnBounds="true" preserveRatio="true" visible="false">
+                <Text fx:id="searchErrorText" fill="RED" layoutX="62.0" layoutY="82.0" strokeType="OUTSIDE"
+                      strokeWidth="0.0" text="Строчка некорректна. Повторите попытку." visible="false"
+                      wrappingWidth="162.93673706054688">
+                    <font>
+                        <Font name="System Bold" size="12.0"/>
+                    </font>
+                </Text>
+                <Text fx:id="weatherSuccessText" fill="#6eff00" layoutX="683.0" layoutY="89.0" strokeType="OUTSIDE"
+                      strokeWidth="0.0" text="Погода успешно обновлена" textAlignment="CENTER" visible="false"
+                      wrappingWidth="174.39999999999992">
+                    <font>
+                        <Font name="System Bold" size="12.0"/>
+                    </font>
+                </Text>
+                <ImageView fx:id="dialogueImage" fitHeight="121.0" fitWidth="201.0" layoutX="319.0" layoutY="-15.0"
+                           nodeOrientation="RIGHT_TO_LEFT" pickOnBounds="true" preserveRatio="true" visible="false">
                     <image>
-                        <Image url="@../images/дождь_задержка_0_секунд.gif"/>
+                        <Image url="@../images/dialogue.png"/>
                     </image>
                 </ImageView>
+                <Text fx:id="dialogueText" layoutX="360.0" layoutY="26.0" strokeType="OUTSIDE" strokeWidth="0.0"
+                      text="Давно тебя не было на нашей ферме! Сделай свои дела!!!" textAlignment="JUSTIFY"
+                      visible="false" wrappingWidth="130.3125"/>
             </children>
         </AnchorPane>
     </children>

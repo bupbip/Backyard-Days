@@ -6,8 +6,10 @@ import org.jsoup.select.Elements;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.Month;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,10 +24,10 @@ public class Weather {
      * @return Данные о погоде и температуре или null в случае неудачи
      */
 
-    public Map<Integer, String> getWeather(int month, int year) {
+    public Map<Integer, String> getWeather(String filepath, int month, int year) {
         month += 1;
         String currentMonth = Month.of(month).name() + "-" + year;
-        String fileWeather = FileWorker.searchWeatherInFile(currentMonth);
+        String fileWeather = FileWorker.searchWeatherInFile(filepath, currentMonth);
         Map<Integer, String> forecastCurrentMonth = new HashMap<>();
         if (fileWeather == null) {
             String urlString = "https://world-weather.ru/pogoda/russia/moscow/" + currentMonth + "/";
@@ -49,7 +51,7 @@ public class Weather {
                 for (int i = 0; i < celsius.size(); i++) {
                     forecastCurrentMonth.put(i, celsius.get(i) + " " + weather.get(i));
                 }
-                FileWorker.addWeatherToFile("forecast", currentMonth + String.valueOf(forecastCurrentMonth));
+                FileWorker.addWeatherToFile(filepath, currentMonth + String.valueOf(forecastCurrentMonth));
             } catch (IOException e) {
                 return null;
             }
@@ -69,7 +71,9 @@ public class Weather {
      */
 
     public void clearForecast() {
-        try (FileWriter writer = new FileWriter("src/files/forecast.txt", false)) {
+        String timeStamp = new SimpleDateFormat("dd.MM.yyyy").format(Calendar.getInstance().getTime());
+        String weatherFilepath = "src/files/" + timeStamp + "_forecast.txt";
+        try (FileWriter writer = new FileWriter(weatherFilepath, false)) {
             writer.write("");
         } catch (IOException ex) {
             System.out.println(ex.getMessage());

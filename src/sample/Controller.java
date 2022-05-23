@@ -1,5 +1,8 @@
 package sample;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import javafx.fxml.FXML;
@@ -84,14 +87,29 @@ public class Controller {
     @FXML
     private ImageView rainGif;
 
+    @FXML
+    private Text searchErrorText;
+
+    @FXML
+    private Text weatherSuccessText;
+
+    @FXML
+    private Text dialogueText;
+
+    @FXML
+    private ImageView dialogueImage;
+
     /**
-     * Выполняется при запуске, задаёт текущие месяц и год в актуальные
+     * Выполняется при запуске, задаёт текущие месяц и год в актуальные,
+     * проверяет наличие задач на сегодня
      */
 
     public void initialize() {
         month = Calendar.getInstance().get(Calendar.MONTH);
         year = Calendar.getInstance().get(Calendar.YEAR);
         weather = new Weather();
+        boolean haveTasks = DayMenu.getNumOfNotes(FileWorker.searchNotesInFile(new SimpleDateFormat("dd.MM.yyyy").format(Calendar.getInstance().getTime()))) > 0;
+        DayMenu.visible(haveTasks, dialogueImage, dialogueText);
         fillCalendar();
     }
 
@@ -230,6 +248,14 @@ public class Controller {
         return week;
     }
 
+    /**
+     * Проверка на погоду в текущий день
+     *
+     * @param day              Собственно, день
+     * @param weatherCondition Возможный тип погоды
+     * @return Соответствует/не соответствует
+     */
+
     public boolean isContains(int day, String weatherCondition) {
         return currMonthForecast.get(day).toLowerCase().contains(weatherCondition);
     }
@@ -242,11 +268,26 @@ public class Controller {
      */
 
     public void fillCalendar() {
+        String timeStamp = new SimpleDateFormat("dd.MM.yyyy").format(Calendar.getInstance().getTime());
+        Calendar yesterday = Calendar.getInstance();
+        yesterday.add(Calendar.DATE, -1);
+        String weatherFilepath = "src/files/" + timeStamp + "_forecast.txt";
+        String oldWeatherFilepath = "src/files/" + new SimpleDateFormat("dd.MM.yyyy").format(yesterday.getTime()) + "_forecast.txt";
+        File weatherFile = new File(weatherFilepath);
+        if (!weatherFile.exists()) {
+            try {
+                weatherFile.createNewFile();
+                File oldNotesFile = new File(oldWeatherFilepath);
+                oldNotesFile.delete();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         Map<Integer, Integer> currMonth = getCurrMonth();
         Map<Integer, Integer> dayToMonthBefore = getDaysBefore(currMonth);
         Map<Integer, Integer> dayToMonthAfter = getDaysAfter(currMonth);
         int week = 0;
-        currMonthForecast = weather.getWeather(month, year);
+        currMonthForecast = weather.getWeather(weatherFilepath, month, year);
         week = addPanel(dayToMonthBefore, week, false);
         week = addPanel(currMonth, week, true);
         addPanel(dayToMonthAfter, week, false);
@@ -278,16 +319,27 @@ public class Controller {
 
     public void search() {
         String[] searchArray;
-        searchArray = toSearch.getText().split("[.]");
-        int searchMonth = Integer.parseInt(searchArray[0]);
-        int searchYear = Integer.parseInt(searchArray[1]);
-        if (searchMonth > 0 && searchMonth < 13) {
-            month = searchMonth - 1;
-            year = searchYear;
-            clearGridPane();
-            fillCalendar();
+        String textToSearch = toSearch.getText();
+        if (textToSearch.matches("^((0[1-9])|(1[0-2]))\\.\\d{4}$")) {
+            searchArray = toSearch.getText().split("[.]");
+            int searchMonth = Integer.parseInt(searchArray[0]);
+            int searchYear = Integer.parseInt(searchArray[1]);
+            if (searchMonth > 0 && searchMonth < 13) {
+                month = searchMonth - 1;
+                year = searchYear;
+                clearGridPane();
+                fillCalendar();
+                searchErrorText.setVisible(false);
+            }
         } else {
-            System.out.println("Миссия невыполнима");
+            searchErrorText.setVisible(true);
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    searchErrorText.setVisible(false);
+                }
+            }, 3 * 1000);
         }
         toSearch.setText("");
     }
@@ -321,16 +373,25 @@ public class Controller {
         date.setFill(color);
         date.setStroke(Color.BLACK);
         button.setId(currentDate + "," + blockType);
+        date.setId(currentDate + "," + blockType);
         GridPane.setConstraints(button, col, row);
         gridPane.getChildren().add(button);
         gridPane.add(date, col, row);
         gridPane.setCursor(Cursor.HAND);
+        selectDay(button);
+        selectDay(date);
+    }
+
+    /**
+     * Назначает действия на день и на цифру
+     *
+     * @param button День или цифра
+     */
+
+    public void selectDay(Node button) {
         DayMenu thisDayMenu = new DayMenu();
         button.setOnMouseClicked(e -> {
-            thisDayMenu.cellSelected(button.getId(), currentDateField, placeToBlockImage, flower, dayMenuImage, exitButton, textArea, saveButton, backgroundImage, gridPane, daysOfWeekLabel, nextMonthButton, prevMonthButton, toSearch, searchButton, resetButton, updateText, toSearchImage);
-        });
-        date.setOnMouseClicked(e -> {
-            thisDayMenu.cellSelected(button.getId(), currentDateField, placeToBlockImage, flower, dayMenuImage, exitButton, textArea, saveButton, backgroundImage, gridPane, daysOfWeekLabel, nextMonthButton, prevMonthButton, toSearch, searchButton, resetButton, updateText, toSearchImage);
+            thisDayMenu.cellSelected(button.getId(), dialogueImage, dialogueText, currentDateField, placeToBlockImage, flower, dayMenuImage, exitButton, textArea, saveButton, backgroundImage, gridPane, daysOfWeekLabel, nextMonthButton, prevMonthButton, toSearch, searchButton, resetButton, updateText, toSearchImage);
         });
     }
 
@@ -342,5 +403,15 @@ public class Controller {
     private void clearForecast() {
         weather.clearForecast();
         fillCalendar();
+        weatherSuccessText.setVisible(true);
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                weatherSuccessText.setVisible(false);
+            }
+        }, 3 * 1000);
     }
+
+
 }

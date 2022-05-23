@@ -7,7 +7,10 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DayMenu {
 
@@ -17,7 +20,9 @@ public class DayMenu {
      * @param buttonID Айди кнопки(дата)
      */
 
-    public void cellSelected(String buttonID, Text currentDate, ImageView placeToBlockImage, ImageView flower, ImageView dayMenuImage, ImageView exitButton, TextArea textArea, ImageView saveButton, Node... elements) {
+    public void cellSelected(String buttonID, ImageView dialogueImage, Text dialogueText, Text currentDate, ImageView placeToBlockImage, ImageView flower, ImageView dayMenuImage, ImageView exitButton, TextArea textArea, ImageView saveButton, Node... elements) {
+        AtomicBoolean haveTasks = new AtomicBoolean(DayMenu.getNumOfNotes(FileWorker.searchNotesInFile(new SimpleDateFormat("dd.MM.yyyy").format(Calendar.getInstance().getTime()))) > 0);
+        visible(haveTasks.get(), dialogueImage, dialogueText);
         blur(true, elements);
         visible(true, exitButton, textArea, saveButton, dayMenuImage, placeToBlockImage, flower, currentDate);
         String cellDate = buttonID.split(",")[0];
@@ -30,6 +35,8 @@ public class DayMenu {
         flower.setImage(new Image("images/flowers/цветок" + numOfNotes + ".png"));
         saveButton.setOnMouseClicked(e -> {
             FileWorker.addNotesToFile(cellDate, textArea.getText() + "\nEOT");
+            haveTasks.set(DayMenu.getNumOfNotes(FileWorker.searchNotesInFile(new SimpleDateFormat("dd.MM.yyyy").format(Calendar.getInstance().getTime()))) > 0);
+            visible(haveTasks.get(), dialogueImage, dialogueText);
         });
         exitButton.setOnMouseClicked(t -> {
             textArea.setText("");
@@ -61,7 +68,7 @@ public class DayMenu {
      * @param needToVisible объекты для взаимодействия
      */
 
-    public void visible(boolean visible, Node... needToVisible) {
+    public static void visible(boolean visible, Node... needToVisible) {
         Arrays.stream(needToVisible).forEach(obj -> obj.setVisible(visible));
     }
 
@@ -72,7 +79,10 @@ public class DayMenu {
      * @return кол-во заметок
      */
 
-    public int getNumOfNotes(String notes) {
+    public static int getNumOfNotes(String notes) {
+        if (notes.equals("\n")) {
+            return 0;
+        }
         int counter = 0;
         for (int i = 0; i < notes.length(); i++) {
             if (notes.charAt(i) == '\n') {
