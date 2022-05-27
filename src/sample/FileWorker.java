@@ -10,8 +10,9 @@ public class FileWorker {
 
     /**
      * Добавляет погоду в файл
+     *
      * @param filepath Путь до актуального файла
-     * @param line Строчка для сохранения
+     * @param line     Строчка для сохранения
      */
 
     public static void addWeatherToFile(String filepath, String line) {
@@ -27,7 +28,7 @@ public class FileWorker {
      * Ищет погоду по нужной дате в файле
      *
      * @param filepath Путь до актуального файла
-     * @param search Дата, для поиска
+     * @param search   Дата, для поиска
      * @return Строка с нужной погодой
      */
 
@@ -116,6 +117,7 @@ public class FileWorker {
 
     /**
      * Создание файла в случае его отсутствия
+     *
      * @param filepath Путь до файла
      */
 
