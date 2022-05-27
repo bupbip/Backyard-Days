@@ -20,8 +20,9 @@ public class DayMenu {
      * @param buttonID Айди кнопки(дата)
      */
 
-    public void cellSelected(String buttonID, ImageView dialogueImage, Text dialogueText, Text currentDate, ImageView placeToBlockImage, ImageView flower, ImageView dayMenuImage, ImageView exitButton, TextArea textArea, ImageView saveButton, Node... elements) {
-        AtomicBoolean haveTasks = new AtomicBoolean(DayMenu.getNumOfNotes(FileWorker.searchNotesInFile(new SimpleDateFormat("dd.MM.yyyy").format(Calendar.getInstance().getTime()))) > 0);
+    public void cellSelected(String pathToFiles, String buttonID, ImageView dialogueImage, Text dialogueText, Text currentDate, ImageView placeToBlockImage, ImageView flower, ImageView dayMenuImage, ImageView exitButton, TextArea textArea, ImageView saveButton, Node... elements) {
+//        String pathToNotesFile = pathToFiles;
+        AtomicBoolean haveTasks = new AtomicBoolean(DayMenu.getNumOfNotes(FileWorker.searchNotesInFile(pathToFiles, new SimpleDateFormat("dd.MM.yyyy").format(Calendar.getInstance().getTime()))) > 0);
         visible(haveTasks.get(), dialogueImage, dialogueText);
         blur(true, elements);
         visible(true, exitButton, textArea, saveButton, dayMenuImage, placeToBlockImage, flower, currentDate);
@@ -29,13 +30,13 @@ public class DayMenu {
         String blockType = buttonID.split(",")[1];
         placeToBlockImage.setImage(new Image("images/blocks/" + blockType + ".jpg"));
         currentDate.setText(cellDate);
-        String notes = FileWorker.searchNotesInFile(cellDate).trim();
+        String notes = FileWorker.searchNotesInFile(pathToFiles, cellDate).trim();
         textArea.setText(notes);
         int numOfNotes = getNumOfNotes(notes);
         flower.setImage(new Image("images/flowers/цветок" + numOfNotes + ".png"));
         saveButton.setOnMouseClicked(e -> {
-            FileWorker.addNotesToFile(cellDate, textArea.getText() + "\nEOT");
-            haveTasks.set(DayMenu.getNumOfNotes(FileWorker.searchNotesInFile(new SimpleDateFormat("dd.MM.yyyy").format(Calendar.getInstance().getTime()))) > 0);
+            FileWorker.addNotesToFile(pathToFiles,cellDate, textArea.getText() + "\nEOT");
+            haveTasks.set(DayMenu.getNumOfNotes(FileWorker.searchNotesInFile(pathToFiles, new SimpleDateFormat("dd.MM.yyyy").format(Calendar.getInstance().getTime()))) > 0);
             visible(haveTasks.get(), dialogueImage, dialogueText);
         });
         exitButton.setOnMouseClicked(t -> {

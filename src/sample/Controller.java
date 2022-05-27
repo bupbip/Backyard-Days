@@ -28,6 +28,7 @@ public class Controller {
     private static int month;
     private static int year;
     private static Map<Integer, String> currMonthForecast = new HashMap<>();
+    private final String pathToFiles = System.getenv("APPDATA") + "\\Backyard-Days\\";
     private Weather weather;
 
     @FXML
@@ -108,9 +109,15 @@ public class Controller {
         month = Calendar.getInstance().get(Calendar.MONTH);
         year = Calendar.getInstance().get(Calendar.YEAR);
         weather = new Weather();
-        boolean haveTasks = DayMenu.getNumOfNotes(FileWorker.searchNotesInFile(new SimpleDateFormat("dd.MM.yyyy").format(Calendar.getInstance().getTime()))) > 0;
+        boolean haveTasks = DayMenu.getNumOfNotes(FileWorker.searchNotesInFile(pathToFiles, new SimpleDateFormat("dd.MM.yyyy").format(Calendar.getInstance().getTime()))) > 0;
         DayMenu.visible(haveTasks, dialogueImage, dialogueText);
+        checkFolders();
         fillCalendar();
+    }
+
+    private void checkFolders() {
+        String path = pathToFiles + "notes";
+        new File(path).mkdirs();
     }
 
     /**
@@ -122,7 +129,11 @@ public class Controller {
 
     private Map<Integer, Integer> getCurrMonth() {
         updateYear();
-        currMonth.setText(Months.values()[month].toString() + " " + year);
+        if(year < 0){
+            currMonth.setText(Months.values()[month].toString() + " " + Math.abs(year) + " до н.э.");
+        } else {
+            currMonth.setText(Months.values()[month].toString() + " " + year);
+        }
         Map<Integer, Integer> dayToMonth = new HashMap<>();
         Calendar maxDays = new GregorianCalendar(year, month, 1);
         int days = maxDays.getActualMaximum(Calendar.DAY_OF_MONTH);
@@ -271,7 +282,7 @@ public class Controller {
 
     public void fillCalendar() {
         String timeStamp = new SimpleDateFormat("dd.MM.yyyy").format(Calendar.getInstance().getTime());
-        String weatherFilepath = "src/files/" + timeStamp + "_forecast.txt";
+        String weatherFilepath = pathToFiles + timeStamp + "_forecast.txt";
         File weatherFile = new File(weatherFilepath);
         if (!weatherFile.exists()) {
             try {
@@ -404,7 +415,10 @@ public class Controller {
     private void selectDay(Node button) {
         DayMenu thisDayMenu = new DayMenu();
         button.setOnMouseClicked(e -> {
-            thisDayMenu.cellSelected(button.getId(), dialogueImage, dialogueText, currentDateField, placeToBlockImage, flower, dayMenuImage, exitButton, textArea, saveButton, backgroundImage, gridPane, daysOfWeekLabel, nextMonthButton, prevMonthButton, toSearch, searchButton, resetButton, updateText, toSearchImage);
+            thisDayMenu.cellSelected(pathToFiles, button.getId(), dialogueImage, dialogueText, currentDateField,
+                    placeToBlockImage, flower, dayMenuImage, exitButton, textArea, saveButton, backgroundImage,
+                    gridPane, daysOfWeekLabel, nextMonthButton, prevMonthButton, toSearch, searchButton, resetButton,
+                    updateText, toSearchImage);
         });
     }
 
@@ -414,7 +428,7 @@ public class Controller {
 
     @FXML
     private void clearForecast() {
-        weather.clearForecast();
+        weather.clearForecast(pathToFiles);
         fillCalendar();
         weatherSuccessText.setVisible(true);
         Timer timer = new Timer();
