@@ -120,7 +120,7 @@ public class Controller {
      * @return Мапу, где ключ - день месяца, значение - день недели, который он занимает
      */
 
-    public Map<Integer, Integer> getCurrMonth() {
+    private Map<Integer, Integer> getCurrMonth() {
         updateYear();
         currMonth.setText(Months.values()[month].toString() + " " + year);
         Map<Integer, Integer> dayToMonth = new HashMap<>();
@@ -142,7 +142,7 @@ public class Controller {
      * @return Мапу последних дат предыдущего месяца
      */
 
-    public Map<Integer, Integer> getDaysBefore(Map<Integer, Integer> dayToMonth) {
+    private Map<Integer, Integer> getDaysBefore(Map<Integer, Integer> dayToMonth) {
         updateYear();
         Map<Integer, Integer> dayToMonthBefore = new HashMap<>();
         Calendar maxDays = new GregorianCalendar(year, month - 1, 1);
@@ -162,7 +162,7 @@ public class Controller {
      * @return Мапу первых дат последующего месяца
      */
 
-    public Map<Integer, Integer> getDaysAfter(Map<Integer, Integer> dayToMonth) {
+    private Map<Integer, Integer> getDaysAfter(Map<Integer, Integer> dayToMonth) {
         updateYear();
         Map<Integer, Integer> dayToMonthAfter = new HashMap<>();
         Calendar maxDays = new GregorianCalendar(year, month, 1);
@@ -201,7 +201,7 @@ public class Controller {
      * @return Номер недели месяца, на котором мы остановились
      */
 
-    public int addPanel(Map<Integer, Integer> days, int week, boolean clickable) {
+    private int addPanel(Map<Integer, Integer> days, int week, boolean clickable) {
         Set<Integer> setKeys = days.keySet();
         String blockType = "stone";
         if (clickable) {
@@ -223,8 +223,8 @@ public class Controller {
                 }
                 if (today.get(Calendar.DAY_OF_MONTH) == day && today.get(Calendar.MONTH) == month && today.get(Calendar.YEAR) == year) {
                     addButtons(day, days.get(day), week, blockType, Color.LIME);
-                    if(currMonthForecast != null){
-                        rainGif.setVisible(currMonthForecast.get(day - 1).contains("осадки") || currMonthForecast.get(day - 1).contains("Дождь"));
+                    if (currMonthForecast != null) {
+                        rainGif.setVisible(currMonthForecast.get(day - 1).contains("осадки") || currMonthForecast.get(day - 1).contains("дождь"));
                     }
                 }
                 if (dayOfWeek == 6) week++;
@@ -258,7 +258,7 @@ public class Controller {
      * @return Соответствует/не соответствует
      */
 
-    public boolean isContains(int day, String weatherCondition) {
+    private boolean isContains(int day, String weatherCondition) {
         return currMonthForecast.get(day).toLowerCase().contains(weatherCondition);
     }
 
@@ -275,7 +275,7 @@ public class Controller {
         File weatherFile = new File(weatherFilepath);
         if (!weatherFile.exists()) {
             try {
-                processFilesFromFolder(new File("src/files/"));
+                clearWeatherFileFromFolder(new File("src/files/"));
                 weatherFile.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -291,12 +291,16 @@ public class Controller {
         addPanel(dayToMonthAfter, week, false);
     }
 
-    public void processFilesFromFolder(File folder)
-    {
+    /**
+     * Очищает устаревший прогноз погоды
+     *
+     * @param folder Путь до файла
+     */
+
+    private void clearWeatherFileFromFolder(File folder) {
         File[] folderEntries = folder.listFiles();
-        for (File entry : folderEntries)
-        {
-            if (!entry.isDirectory()){
+        for (File entry : folderEntries) {
+            if (!entry.isDirectory()) {
                 entry.delete();
             }
         }
@@ -373,7 +377,7 @@ public class Controller {
      * @param color     Цвет цифры дня на картинке
      */
 
-    public void addButtons(int day, int col, int row, String blockType, Color color) {
+    private void addButtons(int day, int col, int row, String blockType, Color color) {
         String currentDate = String.format("%02d.%02d.%d", day, month + 1, year);
         ImageView button = new ImageView(new Image("images/blocks/" + blockType + ".jpg"));
         Text date = new Text(String.valueOf(day));
@@ -397,7 +401,7 @@ public class Controller {
      * @param button День или цифра
      */
 
-    public void selectDay(Node button) {
+    private void selectDay(Node button) {
         DayMenu thisDayMenu = new DayMenu();
         button.setOnMouseClicked(e -> {
             thisDayMenu.cellSelected(button.getId(), dialogueImage, dialogueText, currentDateField, placeToBlockImage, flower, dayMenuImage, exitButton, textArea, saveButton, backgroundImage, gridPane, daysOfWeekLabel, nextMonthButton, prevMonthButton, toSearch, searchButton, resetButton, updateText, toSearchImage);
