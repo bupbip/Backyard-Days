@@ -16,6 +16,7 @@ public class FileWorker {
      */
 
     public static void addWeatherToFile(String filepath, String line) {
+        checkIsFileValid(filepath);
         try (FileWriter writer = new FileWriter(filepath, true)) {
             writer.write(line);
             writer.write("\n");
@@ -54,9 +55,9 @@ public class FileWorker {
      * @return Заметки на текущий день или null при их отсутствии
      */
 
-    public static String searchNotesInFile(String search) {
-        String pathToFile = "src/files/notes/" + search.substring(3) + "_notes.txt";
-        checkIsNoteFileValid(pathToFile);
+    public static String searchNotesInFile(String filepath, String search) {
+        String pathToFile = filepath + "notes\\" + search.substring(3) + "_notes.txt";
+        checkIsFileValid(pathToFile);
         try (BufferedReader reader = new BufferedReader(new FileReader(pathToFile))) {
             String line = reader.readLine();
             boolean write = false;
@@ -87,9 +88,9 @@ public class FileWorker {
      * @param newNote  Заметки для добавления
      */
 
-    public static void addNotesToFile(String buttonID, String newNote) {
-        String pathToFile = "src/files/notes/" + buttonID.substring(3) + "_notes.txt";
-        checkIsNoteFileValid(pathToFile);
+    public static void addNotesToFile(String filepath, String buttonID, String newNote) {
+        String pathToFile = filepath + "notes\\" + buttonID.substring(3) + "_notes.txt";
+        checkIsFileValid(pathToFile);
         try (BufferedReader reader = new BufferedReader(new FileReader(pathToFile))) {
             String line = reader.readLine();
             boolean save = true;
@@ -121,7 +122,7 @@ public class FileWorker {
      * @param filepath Путь до файла
      */
 
-    private static void checkIsNoteFileValid(String filepath) {
+    private static void checkIsFileValid(String filepath) {
         File notesFile = new File(filepath);
         if (!notesFile.exists()) {
             try {

@@ -70,9 +70,9 @@ public class Weather {
      * Очищает файл с погодой
      */
 
-    public void clearForecast() {
+    public void clearForecast(String filepath) {
         String timeStamp = new SimpleDateFormat("dd.MM.yyyy").format(Calendar.getInstance().getTime());
-        String weatherFilepath = "src/files/" + timeStamp + "_forecast.txt";
+        String weatherFilepath = filepath + timeStamp + "_forecast.txt";
         try (FileWriter writer = new FileWriter(weatherFilepath, false)) {
             writer.write("");
         } catch (IOException ex) {
