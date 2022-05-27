@@ -34,7 +34,7 @@ public class Weather {
             ArrayList<String> celsius = new ArrayList<>();
             ArrayList<String> weather = new ArrayList<>();
             try {
-                Document page = Jsoup.connect(urlString).get();
+                Document page = Jsoup.connect(urlString).timeout(500).get();
                 Elements weatherDays = page.getElementsByClass("ww-month");
                 String[] forecast = page.select(".ww-month").toString().split("=");
                 String[] monthWeatherString = weatherDays.text().split(" ");

@@ -223,7 +223,9 @@ public class Controller {
                 }
                 if (today.get(Calendar.DAY_OF_MONTH) == day && today.get(Calendar.MONTH) == month && today.get(Calendar.YEAR) == year) {
                     addButtons(day, days.get(day), week, blockType, Color.LIME);
-                    rainGif.setVisible(currMonthForecast.get(day - 1).contains("осадки") || currMonthForecast.get(day - 1).contains("Дождь"));
+                    if(currMonthForecast != null){
+                        rainGif.setVisible(currMonthForecast.get(day - 1).contains("осадки") || currMonthForecast.get(day - 1).contains("Дождь"));
+                    }
                 }
                 if (dayOfWeek == 6) week++;
             }
@@ -269,16 +271,12 @@ public class Controller {
 
     public void fillCalendar() {
         String timeStamp = new SimpleDateFormat("dd.MM.yyyy").format(Calendar.getInstance().getTime());
-        Calendar yesterday = Calendar.getInstance();
-        yesterday.add(Calendar.DATE, -1);
         String weatherFilepath = "src/files/" + timeStamp + "_forecast.txt";
-        String oldWeatherFilepath = "src/files/" + new SimpleDateFormat("dd.MM.yyyy").format(yesterday.getTime()) + "_forecast.txt";
         File weatherFile = new File(weatherFilepath);
         if (!weatherFile.exists()) {
             try {
+                processFilesFromFolder(new File("src/files/"));
                 weatherFile.createNewFile();
-                File oldNotesFile = new File(oldWeatherFilepath);
-                oldNotesFile.delete();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -291,6 +289,17 @@ public class Controller {
         week = addPanel(dayToMonthBefore, week, false);
         week = addPanel(currMonth, week, true);
         addPanel(dayToMonthAfter, week, false);
+    }
+
+    public void processFilesFromFolder(File folder)
+    {
+        File[] folderEntries = folder.listFiles();
+        for (File entry : folderEntries)
+        {
+            if (!entry.isDirectory()){
+                entry.delete();
+            }
+        }
     }
 
     /**
