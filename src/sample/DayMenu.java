@@ -35,7 +35,7 @@ public class DayMenu {
         int numOfNotes = getNumOfNotes(notes);
         flower.setImage(new Image("images/flowers/цветок" + numOfNotes + ".png"));
         saveButton.setOnMouseClicked(e -> {
-            FileWorker.addNotesToFile(pathToFiles,cellDate, textArea.getText() + "\nEOT");
+            FileWorker.addNotesToFile(pathToFiles, cellDate, textArea.getText() + "\nEOT");
             haveTasks.set(DayMenu.getNumOfNotes(FileWorker.searchNotesInFile(pathToFiles, new SimpleDateFormat("dd.MM.yyyy").format(Calendar.getInstance().getTime()))) > 0);
             visible(haveTasks.get(), dialogueImage, dialogueText);
         });

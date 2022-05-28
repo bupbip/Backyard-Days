@@ -129,7 +129,7 @@ public class Controller {
 
     private Map<Integer, Integer> getCurrMonth() {
         updateYear();
-        if(year < 0){
+        if (year < 0) {
             currMonth.setText(Months.values()[month].toString() + " " + Math.abs(year) + " до н.э.");
         } else {
             currMonth.setText(Months.values()[month].toString() + " " + year);
@@ -286,7 +286,7 @@ public class Controller {
         File weatherFile = new File(weatherFilepath);
         if (!weatherFile.exists()) {
             try {
-                clearWeatherFileFromFolder(new File("src/files/"));
+                clearWeatherFileFromFolder(new File(pathToFiles));
                 weatherFile.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
