@@ -21,7 +21,6 @@ public class DayMenu {
      */
 
     public void cellSelected(String pathToFiles, String buttonID, ImageView dialogueImage, Text dialogueText, Text currentDate, ImageView placeToBlockImage, ImageView flower, ImageView dayMenuImage, ImageView exitButton, TextArea textArea, ImageView saveButton, Node... elements) {
-//        String pathToNotesFile = pathToFiles;
         AtomicBoolean haveTasks = new AtomicBoolean(DayMenu.getNumOfNotes(FileWorker.searchNotesInFile(pathToFiles, new SimpleDateFormat("dd.MM.yyyy").format(Calendar.getInstance().getTime()))) > 0);
         visible(haveTasks.get(), dialogueImage, dialogueText);
         blur(true, elements);
